@@ -7,6 +7,17 @@
         private int _octaves = 4; //количество октав
         private float _persistence = 0.5f; //влияние каждой октавы
         private float _lacunarity = 2.0f; //частота каждой октавы
+        private bool _useCellularAutomation = true; //флаг для применения клеточного автомата
+
+        public PerlinNoiseGenerator(float scale, float threshold, int octaves, float persistence, float lacunarity, bool useCellularAutomation)
+        {
+            _scale = scale;
+            _threshold = threshold;
+            _octaves = octaves;
+            _persistence = persistence;
+            _lacunarity = lacunarity;
+            _useCellularAutomation = useCellularAutomation;
+        }
 
         /// <summary>
         /// 
@@ -176,7 +187,8 @@
                     map[x, y] = normalizedValue > _threshold; // если значение выше порога - это стена
                 }
             }
-            map = ApplyCellularAutomation(map, 5); //применяем клеточный автомат для улучшения структуры пещер
+            if (_useCellularAutomation)
+                map = ApplyCellularAutomation(map, 5); //применяем клеточный автомат для улучшения структуры пещер
 
             return map;
         }
