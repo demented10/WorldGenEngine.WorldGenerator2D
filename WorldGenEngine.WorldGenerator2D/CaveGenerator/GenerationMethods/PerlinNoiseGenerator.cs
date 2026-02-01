@@ -1,24 +1,89 @@
 ﻿namespace WorldGenEngine.WorldGenerator2D.CaveGenerator.GenerationMethods
 {
-    class PerlinNoiseGenerator : IMapGenerator
+    public class PerlinNoiseGenerator : IMapGenerator
     {
         private float _scale = 0.1f; //масштаб шума (чем меньше, тем больше пещеры)
         private float _threshold = 0.0f; //порог для определения стен и проходов
         private int _octaves = 4; //количество октав
         private float _persistence = 0.5f; //влияние каждой октавы
         private float _lacunarity = 2.0f; //частота каждой октавы
+        private float _verticalBias = 0.3f; //вертикальный градиент для сужения пещер к верху
+        private int _seed = 1337; //семя для генерации шума
+        private int _cellularAutomationIterations = 5; //количество итераций клеточного автомата
         private bool _useCellularAutomation = true; //флаг для применения клеточного автомата
+        
 
-        public PerlinNoiseGenerator(float scale, float threshold, int octaves, float persistence, float lacunarity, bool useCellularAutomation)
+        private const int GRADIENT_TABLE_SIZE = 256;
+        private int[] _permutationTable;
+        private float[,] _gradients;
+
+
+        public PerlinNoiseGenerator()
+        {
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="scale">масштаб шума (чем меньше, тем больше пещеры)</param>
+        /// <param name="threshold">порог для определения стен и проходов</param>
+        /// <param name="octaves">количество октав</param>
+        /// <param name="persistence">влияние каждой октавы</param>
+        /// <param name="seed">семя для генерации шума</param>
+        /// <param name="seed">семя для генерации шума</param>
+        /// <param name="lacunarity">частота каждой октавы</param>
+        /// <param name="useCellularAutomation">флаг для применения клеточного автомата</param>
+        public PerlinNoiseGenerator(float scale, float threshold, 
+            int octaves, float persistence, 
+            float lacunarity,int cellularAutomationIterations,
+            int seed,
+            float verticalBias,
+            bool useCellularAutomation)
         {
             _scale = scale;
             _threshold = threshold;
             _octaves = octaves;
             _persistence = persistence;
             _lacunarity = lacunarity;
+            _seed = seed;
+            _cellularAutomationIterations = cellularAutomationIterations;
             _useCellularAutomation = useCellularAutomation;
+            _verticalBias = verticalBias;
+            InitializeGradientTable(_seed);
         }
+        private void InitializeGradientTable(int seed)
+        {
+            _permutationTable = new int[GRADIENT_TABLE_SIZE * 2];
+            _gradients = new float[GRADIENT_TABLE_SIZE * 2, 2];
 
+            var random = new Random(seed);
+
+            // Создаем случайные градиентные векторы
+            for (int i = 0; i < GRADIENT_TABLE_SIZE; i++)
+            {
+                float angle = (float)(random.NextDouble() * Math.PI * 2);
+                _gradients[i, 0] = (float)Math.Cos(angle);
+                _gradients[i, 1] = (float)Math.Sin(angle);
+
+                _gradients[i + GRADIENT_TABLE_SIZE, 0] = _gradients[i, 0];
+                _gradients[i + GRADIENT_TABLE_SIZE, 1] = _gradients[i, 1];
+            }
+
+            // Инициализируем таблицу перестановок
+            for (int i = 0; i < GRADIENT_TABLE_SIZE; i++)
+            {
+                _permutationTable[i] = i;
+            }
+
+            // Перемешиваем таблицу перестановок
+            for (int i = 0; i < GRADIENT_TABLE_SIZE; i++)
+            {
+                int swapIndex = random.Next(GRADIENT_TABLE_SIZE);
+                (_permutationTable[i], _permutationTable[swapIndex]) =
+                    (_permutationTable[swapIndex], _permutationTable[i]);
+
+                _permutationTable[i + GRADIENT_TABLE_SIZE] = _permutationTable[i];
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -27,17 +92,21 @@
         /// <returns></returns>
         private float[] GetPseudoRandomGradientVector(int x, int y)
         {
-            // псевдо-случайное число от 0 до 3 которое всегда неизменно при данных x и y
-            int v = (int)(x * 1836311903 ^ y * 2971215073) & 3;
+            // Используем улучшенную хеш-функцию
+            int hash = (x * 374761393 + y * 668265263 + _seed) & 0x7fffffff;
+            hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
+            hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
+            hash = (hash >> 16) ^ hash;
 
-            switch (v)
-            {
-                case 0: return new float[] { 1, 0 };
-                case 1: return new float[] { -1, 0 };
-                case 2: return new float[] { 0,1};
-                default: return new float[] {0,-1};
-            }
+            int index = hash & (GRADIENT_TABLE_SIZE - 1);
+
+            return new float[] {
+            _gradients[index, 0],
+            _gradients[index, 1]
+        };
         }
+
+
 
         /// <summary>
         /// Метод для вычисления влияния градиентного вектора в узле сетки на заданную точку (x, y).
@@ -54,7 +123,41 @@
 
             float[] gradient = GetPseudoRandomGradientVector(gridX, gridY);
 
-            return Utils.Math.Dot(gradient, new float[] { dx, dy });
+            return Utils.Math.Dot(gradient, [dx,dy]);
+        }
+
+
+        private float PerlinNoiseV2(float fx, float fy)
+        {
+            int left = (int)Math.Floor(fx);
+            int top = (int)Math.Floor(fy);
+
+            float pointInQuadX = fx - left;
+            float pointInQuadY = fy - top;
+
+            float[] topLeftGradient = GetPseudoRandomGradientVector(left, top);
+            float[] topRightGradient = GetPseudoRandomGradientVector(left + 1, top);
+            float[] bottomLeftGradient = GetPseudoRandomGradientVector(left, top + 1);
+            float[] bottomRightGradient = GetPseudoRandomGradientVector(left + 1, top + 1);
+
+            float[] distanceToTopLeft = [pointInQuadX, pointInQuadY];
+            float[] distanceToTopRight = [pointInQuadX - 1, pointInQuadY];
+            float[] distanceToBottomLeft = [pointInQuadX, pointInQuadY - 1];
+            float[] distanceToBottomRight = [pointInQuadX - 1, pointInQuadY - 1];
+
+            float tx1 = Utils.Math.Dot(distanceToTopLeft, topLeftGradient);
+            float tx2 = Utils.Math.Dot(distanceToTopRight, topRightGradient);
+            float bx1 = Utils.Math.Dot(distanceToBottomLeft, bottomLeftGradient);
+            float bx2 = Utils.Math.Dot(distanceToBottomRight, bottomRightGradient);
+
+            pointInQuadX = Utils.Math.QuanticCurve(pointInQuadX);
+            pointInQuadY = Utils.Math.QuanticCurve(pointInQuadY);
+
+            float tx = Utils.Math.Lerp(tx1, tx2, pointInQuadX);
+            float bx = Utils.Math.Lerp(bx1, bx2, pointInQuadX);
+            float tb = Utils.Math.Lerp(tx, bx, pointInQuadY);
+
+            return tb;
         }
 
         /// <summary>
@@ -65,6 +168,8 @@
         /// <returns></returns>
         private float PerlinNoise(float x, float y)
         {
+
+            
             //определяем углы квадрата, в котором находится точка
             int x0 = (int)Math.Floor(x);
             int x1 = x0 + 1;
@@ -110,6 +215,27 @@
 
         }
 
+        private float FractalNoiseV2(float fx, float fy)
+        {
+            float amplitude = 1; // сила применения шума к общей картине, будет уменьшаться с "мельчанием" шума
+                                 // как сильно уменьшаться - регулирует persistence
+            float max = 0; // необходимо для нормализации результата
+            float result = 0; // накопитель результата
+
+            var octaves = _octaves; 
+
+            while (octaves-- > 0)
+            {
+                max += amplitude;
+                result += PerlinNoiseV2(fx, fy) * amplitude;
+                amplitude *= _persistence;
+                fx *= 2; // удваиваем частоту шума (делаем его более мелким) с каждой октавой
+                fy *= 2;
+            }
+
+            return result / max;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -117,7 +243,7 @@
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        private int CountWallsAround(bool[,] map, int x, int y) 
+        private int CountWallsAround(bool[,] map, int x, int y, bool countSelf = false) 
         {
             int width = map.GetLength(0);
             int height = map.GetLength(1);
@@ -127,9 +253,15 @@
             {
                 for(int ny = y-1; ny <=y+1; ny++)
                 {
-                    if(nx>=0 && nx<width && ny >= 0 && ny<height)
+                    if (nx == 0 && ny == 0 && !countSelf)
+                        continue;
+
+                    int checkX = x + nx;
+                    int checkY = y + ny;
+
+                    if (checkX>=0 && checkX<width && checkY >= 0 && checkY<height)
                     {
-                        if (!map[nx, ny])
+                        if (!map[checkX, checkY])
                         {
                             count++;
                         }
@@ -157,8 +289,15 @@
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        int wallCount = CountWallsAround(map, x, y);
-                        newMap[x, y] = wallCount <= 4; //Делаем стеной, если вокруг 4 и больше стен
+                        int wallCount = CountWallsAround(map, x, y, true);
+                        if (!map[x, y] && wallCount < 4)
+                        {
+                            newMap[x, y] = true; //Делаем стеной, если вокруг 4 и больше стен
+                        }
+                        else if (map[x, y] && wallCount > 5)
+                        {
+                            newMap[x, y] = false; //Делаем проходом, если вокруг больше 5 стен
+                        }
                     }
                 }
                 map = (bool[,])newMap.Clone();
@@ -173,18 +312,36 @@
         {
             bool[,] map = new bool[sizeX, sizeY];
 
+            float[,] noiseMap = new float[sizeX, sizeY];
+            float min = float.MaxValue;
+            float max = float.MinValue;
+
+            //Заполняем карту шумом
+            for(int x = 0; x < sizeX; x++)
+            {
+                for(int y = 0; y< sizeY; y++)
+                {
+                    float noiseValue = FractalNoiseV2(x * _scale, y * _scale);
+                    noiseMap[x, y] = noiseValue;
+
+                    if(noiseValue < min) min = noiseValue;
+                    if(noiseValue > max) max = noiseValue;
+                }
+            }
+            
             for (int x=0; x < sizeX; x++)
             {
                 for(int y=0; y< sizeY; y++)
                 {
-                    //Шум для текущей точки                    
-                    float noiseValue = FractalNoise(x * _scale, y * _scale);
-                    float verticalGradient = 1.0f - (float)y / sizeY; //градиент от 1 внизу до 0 вверху - придает пещерный вид
-                    noiseValue+=verticalGradient * 0.5f; //усиливаем шум внизу карты
+                    float normalized = (noiseMap[x,y]-min)/(max-min);
 
-                    float normalizedValue = (noiseValue + 1) / 2; // нормализация к диапазону [0,1]
+                    float verticalBias = 1.0f - (float)y / sizeY;
 
-                    map[x, y] = normalizedValue > _threshold; // если значение выше порога - это стена
+                    // добавляем вертикальный градиент для создания пещер, которые сужаются к верху
+                    normalized += verticalBias * _verticalBias;
+
+                    // если значение выше порога - это стена
+                    map[x, y] = normalized > _threshold; 
                 }
             }
             if (_useCellularAutomation)
@@ -196,4 +353,7 @@
         
 
     }
+
+    
+
 }

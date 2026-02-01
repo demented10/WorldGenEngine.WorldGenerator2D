@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WorldGenEngine.WorldGenerator2D": {
+      "commandName": "Project"
+    },
+    "Профиль 1": {
+      "commandName": "Project"
+    }
+  }
+}
