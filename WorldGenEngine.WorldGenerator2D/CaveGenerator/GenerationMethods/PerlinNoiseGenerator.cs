@@ -8,6 +8,12 @@
         private float _persistence = 0.5f; //влияние каждой октавы
         private float _lacunarity = 2.0f; //частота каждой октавы
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         private float[] GetPseudoRandomGradientVector(int x, int y)
         {
             // псевдо-случайное число от 0 до 3 которое всегда неизменно при данных x и y
@@ -22,6 +28,14 @@
             }
         }
 
+        /// <summary>
+        /// Метод для вычисления влияния градиентного вектора в узле сетки на заданную точку (x, y).
+        /// </summary>
+        /// <param name="gridX"></param>
+        /// <param name="gridY"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         private float CalculateGradientInfluence(int gridX, int gridY, float x, float y)
         {
             float dx = x - gridX;
@@ -32,6 +46,12 @@
             return Utils.Math.Dot(gradient, new float[] { dx, dy });
         }
 
+        /// <summary>
+        /// Метод для генерации Перлин шума в заданной точке (x, y). 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         private float PerlinNoise(float x, float y)
         {
             //определяем углы квадрата, в котором находится точка
@@ -56,7 +76,12 @@
 
             return Utils.Math.Lerp(ix0, ix1, Utils.Math.QuanticCurve(sy));
         }
-        // Фрактальный шум
+        /// <summary>
+        /// Метод для генерации фрактального шума на основе Перлин шума. Используется для создания более сложных и детализированных текстур шума.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         private float FractalNoise(float x, float y)
         {
             float total = 0;
@@ -73,6 +98,64 @@
             return total / maxValue; // нормализованный результат
 
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="map"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        private int CountWallsAround(bool[,] map, int x, int y) 
+        {
+            int width = map.GetLength(0);
+            int height = map.GetLength(1);
+            int count = 0;
+
+            for(int nx = x-1; nx<=x+1; nx++)
+            {
+                for(int ny = y-1; ny <=y+1; ny++)
+                {
+                    if(nx>=0 && nx<width && ny >= 0 && ny<height)
+                    {
+                        if (!map[nx, ny])
+                        {
+                            count++;
+                        }
+                        
+                    }
+                    else 
+                    { 
+                        count++;  //вне границ считается стеной
+                    }
+
+                }
+            }
+            return count;
+        }
+
+        private bool[,] ApplyCellularAutomation(bool[,] map, int iterations)
+        {
+            int width = map.GetLength(0);
+            int height = map.GetLength(1);
+            bool[,] newMap = (bool[,])map.Clone();
+
+            for(int i = 0; i<iterations; i++)
+            {
+                for(int x = 0; x < width; x++)
+                {
+                    for (int y = 0; y < height; y++)
+                    {
+                        int wallCount = CountWallsAround(map, x, y);
+                        newMap[x, y] = wallCount <= 4; //Делаем стеной, если вокруг 4 и больше стен
+                    }
+                }
+                map = (bool[,])newMap.Clone();
+            }
+            return newMap;
+            
+        } 
+
 
 
         public bool[,] GenerateMap(int sizeX, int sizeY)
@@ -93,9 +176,12 @@
                     map[x, y] = normalizedValue > _threshold; // если значение выше порога - это стена
                 }
             }
+            map = ApplyCellularAutomation(map, 5); //применяем клеточный автомат для улучшения структуры пещер
+
             return map;
         }
 
+        
 
     }
 }
