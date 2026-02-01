@@ -26,5 +26,14 @@ namespace WorldGenEngine.WorldGenerator2D.Utils
             return result;
 
         }
+
+        public static int GetHashWithSeed(int x, int y, int seed)
+        {
+            var hash = (x * 374761393 + y * 668265263 + seed) & 0x7fffffff;
+            hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
+            hash = ((hash >> 16) ^ hash) * 0x45d9f3b;
+            hash = (hash >> 16) ^ hash;
+            return hash;
+        }
     }
 }
