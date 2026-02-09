@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace WorldGenEngine.WorldGenerator2D.WorldGeneration.Interfaces
 {
-    internal interface ICaveGenerator
+    public interface IOre
     {
-        bool[,] WorldHeatMap(int sizeX, int sizeY);
+        string Name { get; }
+        string Description { get; }
+        string Type { get; }
     }
 }

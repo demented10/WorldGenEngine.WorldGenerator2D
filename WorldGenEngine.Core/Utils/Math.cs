@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WorldGenEngine.WorldGenerator2D.Utils
+﻿namespace WorldGenEngine.Core.Utils
 {
     public static class Math
     {

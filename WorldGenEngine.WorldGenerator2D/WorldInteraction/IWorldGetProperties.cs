@@ -2,8 +2,8 @@
 
 namespace WorldGenEngine.WorldGenerator2D.WorldInteraction
 {
-    public interface IWorldGetProperties
+    public readonly struct WorldProperties(BlockWorld[] worldBlocks)
     {
-        BlockWorld[] GetBlockWorlds();
+        public BlockWorld[] WorldBlocks { get; } = worldBlocks;
     }
 }

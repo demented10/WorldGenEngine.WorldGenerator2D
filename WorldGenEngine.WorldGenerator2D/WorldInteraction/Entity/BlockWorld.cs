@@ -10,10 +10,10 @@ namespace WorldGenEngine.WorldGenerator2D.WorldInteraction.Entity
     {
         public IPoint Position { get; private set; }
 
-        public WorldProperties WorldParent { get; private set; }
+        public Properties.WorldProperties WorldParent { get; private set; }
         public BlockProperties BlockMeta { get; private set; }
 
-        public BlockWorld(WorldProperties world, IPoint position, BlockProperties blockMeta)
+        public BlockWorld(Properties.WorldProperties world, IPoint position, BlockProperties blockMeta)
         {
             WorldParent = world;
             Position = position;

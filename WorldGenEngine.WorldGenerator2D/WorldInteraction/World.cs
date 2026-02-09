@@ -7,7 +7,7 @@ using WorldGenEngine.WorldGenerator2D.WorldInteraction.Entity;
 
 namespace WorldGenEngine.WorldGenerator2D.WorldInteraction
 {
-    internal class World : IWorldGetProperties
+    internal class World //: IWorldGetProperties
     {
         BlockWorld[] BlockWorlds { get; set; }
 

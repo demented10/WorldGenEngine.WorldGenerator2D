@@ -1,6 +1,8 @@
-﻿namespace WorldGenEngine.WorldGenerator2D.CaveGenerator.GenerationMethods
+﻿using WorldGenEngine.Core.MatrixGeneration.Generators;
+
+namespace WorldGenEngine.Core.GenerationMethods.Algorithms
 {
-    public class PerlinNoiseGenerator : IMapGenerator
+    internal class PerlinNoiseGenerator : IGenerationAlgo
     {
         private readonly float _scale = 0.1f; //масштаб шума (чем меньше, тем больше пещеры)
         private readonly float _threshold = 0.0f; //порог для определения стен и проходов
@@ -104,25 +106,6 @@
         }
 
 
-        /// <summary>
-        /// Метод для вычисления влияния градиентного вектора в узле сетки на заданную точку (x, y).
-        /// </summary>
-        /// <param name="gridX"></param>
-        /// <param name="gridY"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        private float CalculateGradientInfluence(int gridX, int gridY, float x, float y)
-        {
-            var dx = x - gridX;
-            var dy = y - gridY;
-
-            var gradient = GetPseudoRandomGradientVector(gridX, gridY);
-
-            return Utils.Math.Dot(gradient, [dx, dy]);
-        }
-
-
         private float PerlinNoise(float fx, float fy)
         {
             var left = (int)Math.Floor(fx);
@@ -183,7 +166,12 @@
             return result / max;
         }
 
-
+        /// <summary>
+        /// Метод для генерации карты пещер на основе фрактального Перлин шума.
+        /// </summary>
+        /// <param name="sizeX"></param>
+        /// <param name="sizeY"></param>
+        /// <returns>Массив bool где True - стена, False - пустота  </returns>
         public bool[,] GenerateMap(int sizeX, int sizeY)
         {
             var map = new bool[sizeX, sizeY];
@@ -223,5 +211,6 @@
 
             return map;
         }
+
     }
 }

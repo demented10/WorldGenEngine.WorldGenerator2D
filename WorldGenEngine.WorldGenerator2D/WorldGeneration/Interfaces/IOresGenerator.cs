@@ -5,7 +5,9 @@ using System.Text;
 
 namespace WorldGenEngine.WorldGenerator2D.WorldGeneration.Interfaces
 {
-    internal interface IOresGenerator
+    public record OrePlacementData(bool[,] map, IOre ore);
+    public interface IOresGenerator
     {
+        List<OrePlacementData> GenerateOresMap(List<OreGenerationMetadata> oreGenerationConfig);
     }
 }

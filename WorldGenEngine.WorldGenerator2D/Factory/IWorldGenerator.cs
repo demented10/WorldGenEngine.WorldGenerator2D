@@ -8,6 +8,6 @@ namespace WorldGenEngine.WorldGenerator2D.Factory
 {
     public interface IWorldGenerator
     {
-        IWorldGetProperties GenerateWorld();
+        WorldProperties GenerateWorld();
     }
 }
