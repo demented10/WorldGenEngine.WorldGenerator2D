@@ -12,9 +12,7 @@
                 persistence: 0.8f,
                 lacunarity: 1.1f,
                 verticalBias: 0.25f,
-                seed: 213,
-                cellularAutomationIterations: 5,
-                useCellularAutomation: false);
+                seed: 213);
             return generator.GenerateMap(width, height);
         }
         

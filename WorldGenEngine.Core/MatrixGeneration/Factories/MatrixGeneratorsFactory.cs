@@ -1,5 +1,6 @@
 ﻿
 using WorldGenEngine.Core.GenerationMethods.Algorithms;
+using WorldGenEngine.Core.GenerationMethods.Configs;
 using WorldGenEngine.Core.MatrixGeneration.Generators;
 
 namespace WorldGenEngine.Core.MatrixGeneration.Factories
@@ -18,6 +19,6 @@ namespace WorldGenEngine.Core.MatrixGeneration.Factories
         /// Create Perlin Noise based binary matrix generator
         /// </summary>
         /// <returns></returns>
-        public static IBinaryMatrixGenerator CreatePerlinNoiseBinaryMatrixGenerator() => new GenAlgoToMatrixGenAdapter(new PerlinNoiseGenerator());
+        public static IBinaryMatrixGenerator CreatePerlinNoiseBinaryMatrixGenerator(IPerlinNoiseConfig config) => new GenAlgoToMatrixGenAdapter(new PerlinNoiseGenerator(config));
     }
 }

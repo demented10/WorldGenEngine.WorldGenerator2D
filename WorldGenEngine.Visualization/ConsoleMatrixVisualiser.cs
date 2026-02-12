@@ -64,18 +64,16 @@ class ConsoleMatrixVisualiser : ConsoleVisualiser, IVisualisator
         long start = Stopwatch.GetTimestamp();
         var matrix = GetMatrix();
         TimeSpan elapsedGenMatrix = Stopwatch.GetElapsedTime(start);
-
+        VisualizeBinaryMatrix(matrix);
 
         start = Stopwatch.GetTimestamp();
         var rects = _rectsFinder.FindRects(matrix);
         TimeSpan elapsedFindAlgo = Stopwatch.GetElapsedTime(start);
 
-        if (!true)
-        {
-            VisualizeBinaryMatrix(matrix);
+
             DrawLine('-');
             VisualizeRects(rects.ToArray());
-        }
+        
 
 
         /* Console.WriteLine("Список площадей:");

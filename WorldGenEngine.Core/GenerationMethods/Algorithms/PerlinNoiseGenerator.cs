@@ -1,11 +1,13 @@
-﻿using WorldGenEngine.Core.MatrixGeneration.Generators;
+﻿
+using WorldGenEngine.Core.GenerationMethods.Configs;
+
 
 namespace WorldGenEngine.Core.GenerationMethods.Algorithms
 {
     internal class PerlinNoiseGenerator : IGenerationAlgo
     {
-        private readonly float _scale = 0.1f; //масштаб шума (чем меньше, тем больше пещеры)
-        private readonly float _threshold = 0.0f; //порог для определения стен и проходов
+        private readonly float _scale = 0.025f; //масштаб шума (чем меньше, тем больше пещеры)
+        private readonly float _threshold = 0.5f; //порог для определения стен и проходов
         private readonly int _octaves = 4; //количество октав
         private readonly float _persistence = 0.5f; //влияние каждой октавы
         private readonly float _lacunarity = 2.0f; //частота каждой октавы
@@ -20,6 +22,7 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
 
         public PerlinNoiseGenerator()
         {
+            InitializeGradientTable(_seed);
         }
 
         /// <summary>
@@ -29,17 +32,14 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
         /// <param name="threshold">порог для определения стен и проходов</param>
         /// <param name="octaves">количество октав</param>
         /// <param name="persistence">влияние каждой октавы</param>
-        /// <param name="cellularAutomationIterations"></param>
         /// <param name="seed">семя для генерации шума</param>
         /// <param name="lacunarity">частота каждой октавы</param>
         /// <param name="verticalBias"></param>
-        /// <param name="useCellularAutomation">флаг для применения клеточного автомата</param>
         public PerlinNoiseGenerator(float scale, float threshold,
             int octaves, float persistence,
-            float lacunarity, int cellularAutomationIterations,
+            float lacunarity,
             int seed,
-            float verticalBias,
-            bool useCellularAutomation)
+            float verticalBias)
         {
             _scale = scale;
             _threshold = threshold;
@@ -48,6 +48,18 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
             _lacunarity = lacunarity;
             _seed = seed;
             _verticalBias = verticalBias;
+            InitializeGradientTable(_seed);
+        }
+
+        public PerlinNoiseGenerator(IPerlinNoiseConfig config)
+        {
+            _scale = config.Scale;
+            _threshold = config.Threshold;
+            _octaves = config.Octaves;
+            _persistence = config.Persistence;
+            _lacunarity = config.Lacunarity;
+            _seed = config.Seed;
+            _verticalBias = config.VerticalBias;
             InitializeGradientTable(_seed);
         }
 
@@ -98,11 +110,8 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
 
             var index = hash & (GRADIENT_TABLE_SIZE - 1);
 
-            return
-            [
-                _gradients![index, 0],
-                _gradients[index, 1]
-            ];
+            return new float[]{_gradients![index, 0], _gradients[index, 1]};
+
         }
 
 
@@ -119,10 +128,11 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
             var bottomLeftGradient = GetPseudoRandomGradientVector(left, top + 1);
             var bottomRightGradient = GetPseudoRandomGradientVector(left + 1, top + 1);
 
-            float[] distanceToTopLeft = [pointInQuadX, pointInQuadY];
-            float[] distanceToTopRight = [pointInQuadX - 1, pointInQuadY];
-            float[] distanceToBottomLeft = [pointInQuadX, pointInQuadY - 1];
-            float[] distanceToBottomRight = [pointInQuadX - 1, pointInQuadY - 1];
+
+            float[] distanceToTopLeft = new float[]{pointInQuadX, pointInQuadY};
+            float[] distanceToTopRight = new float[] { pointInQuadX - 1, pointInQuadY};
+            float[] distanceToBottomLeft = new float[] { pointInQuadX, pointInQuadY - 1};
+            float[] distanceToBottomRight = new float[] { pointInQuadX - 1, pointInQuadY - 1};
 
             var tx1 = Utils.Math.Dot(distanceToTopLeft, topLeftGradient);
             var tx2 = Utils.Math.Dot(distanceToTopRight, topRightGradient);
@@ -147,7 +157,7 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
         /// <returns></returns>
         private float FractalNoise(float fx, float fy)
         {
-            float amplitude = 1; // сила применения шума к общей картине, будет уменьшаться с "мельчанием" шума
+            float amplitude = _lacunarity; // сила применения шума к общей картине, будет уменьшаться с "мельчанием" шума
             // как сильно уменьшаться - регулирует persistence
             float max = 0; // необходимо для нормализации результата
             float result = 0; // накопитель результата

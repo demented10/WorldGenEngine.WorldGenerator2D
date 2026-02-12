@@ -1,16 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WorldGenEngine.Core.GenerationMethods.Configs;
 using WorldGenEngine.Core.MatrixAlgorithms.Factory;
 using WorldGenEngine.Core.MatrixGeneration.Factories;
 using WorldGenEngine.Visualization;
 
-int w = 6400,h = 6400;
+int w = 64,h = 64;
 
 
-var generator = MatrixGeneratorsFactory.CreateDefault();
+var generator = MatrixGeneratorsFactory.CreatePerlinNoiseBinaryMatrixGenerator(PerlinNoiseConfigFactory.GetDefaultConfig());
 var rectFinder = RectFindersFactory.CreateRowDepthFinder();
 
-IVisualisator visualisator = new ConsoleMatrixVisualiser(generator, w, h, rectFinder);
-visualisator.Visualize();
+IVisualisator visualisation = new ConsoleMatrixVisualiser(generator, w, h, rectFinder);
+visualisation.Visualize();
 
 namespace WorldGenEngine.Visualization
 {

@@ -1,9 +1,11 @@
-﻿namespace WorldGenEngine.Core.MatrixGeneration.Generators;
-
-/// <summary>
-/// Interface defining a binary matrix generator in flat array format
-/// </summary>
-public interface IBinaryMatrixGenerator
+﻿namespace WorldGenEngine.Core.MatrixGeneration.Generators
 {
-    bool[] GenerateMatrix(int width, int height);
+
+    /// <summary>
+    /// Interface defining a binary matrix generator in flat array format
+    /// </summary>
+    public interface IBinaryMatrixGenerator
+    {
+        bool[] GenerateMatrix(int width, int height);
+    }
 }
