@@ -12,7 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WorldGenEngine.Core\WorldGenEngine.Core.csproj" />
     <ProjectReference Include="..\WorldGenEngine.WorldGenerator2D\WorldGenEngine.WorldGenerator2D.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Visualisators\" />
   </ItemGroup>
 
 </Project>

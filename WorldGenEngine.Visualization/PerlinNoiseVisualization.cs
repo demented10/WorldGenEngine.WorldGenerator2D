@@ -1,6 +1,6 @@
-﻿using WorldGenEngine.WorldGenerator2D.CaveGenerator.GenerationMethods;
-namespace WorldGenEngine.Visualization
+﻿namespace WorldGenEngine.Visualization
 {
+    /*
     internal class PerlinNoiseVisualization
     {
         public static bool[,] GeneratePerlinNoiseMap(int width, int height)
@@ -12,11 +12,9 @@ namespace WorldGenEngine.Visualization
                 persistence: 0.8f,
                 lacunarity: 1.1f,
                 verticalBias: 0.25f,
-                seed: 213,
-                cellularAutomationIterations: 5,
-                useCellularAutomation: false);
+                seed: 213);
             return generator.GenerateMap(width, height);
         }
         
-    }
+    }*/
 }

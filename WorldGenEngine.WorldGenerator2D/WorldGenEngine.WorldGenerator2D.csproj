@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WorldGenEngine.Core\WorldGenEngine.Core.csproj" />
+  </ItemGroup>
+
 </Project>
