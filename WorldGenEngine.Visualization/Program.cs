@@ -1,31 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations;
-using WorldGenEngine.Core.GenerationMethods.Configs;
+﻿using WorldGenEngine.Core.GenerationMethods.Configs;
 using WorldGenEngine.Core.MatrixAlgorithms.Factory;
 using WorldGenEngine.Core.MatrixGeneration.Factories;
 using WorldGenEngine.Visualization;
+using WorldGenEngine.Visualization.Visualisators.RaylibVisualize;
 
-int w = 64,h = 64;
 
-
-var generator = MatrixGeneratorsFactory.CreatePerlinNoiseBinaryMatrixGenerator(PerlinNoiseConfigFactory.GetDefaultConfig());
-var rectFinder = RectFindersFactory.CreateRowDepthFinder();
-
-IVisualisator visualisation = new ConsoleMatrixVisualiser(generator, w, h, rectFinder);
-visualisation.Visualize();
-
-namespace WorldGenEngine.Visualization
+class Program
 {
-/*
+    static int w = 640, h = 640;
 
-Console.WriteLine("Generating Perlin Noise Map...");
 
-var map = PerlinNoiseVisualization.GeneratePerlinNoiseMap(512, 512);
+    public  static void  Main(string[] args)
+    {
+        var generator = MatrixGeneratorsFactory.CreatePerlinNoiseBinaryMatrixGenerator(PerlinNoiseConfigFactory.GetDefaultConfig());
+        var rectFinder = RectFindersFactory.CreateRowDepthFinder();
 
-BitmapGenerator.SaveMapAsBitmap(map, "./perlin_noise_map.jpeg");
+        IVisualisator visualisation = new RaylibVisualizer();
+        visualisation.Visualize();
 
-Console.WriteLine("Map size: {0}", map.Length);
-
-Console.WriteLine("Map saved as perlin_noise_map.jpeg");
-
-*/
+    }
 }

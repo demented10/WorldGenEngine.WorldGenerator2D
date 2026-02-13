@@ -1,5 +1,7 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 namespace WorldGenEngine.Visualization
 {
     internal class BitmapGenerator
@@ -27,6 +29,7 @@ namespace WorldGenEngine.Visualization
                     }
                     bitmap.Save(filePath, ImageFormat.Jpeg);
                     Console.WriteLine($"Файл сохранен: {Path.GetFullPath(filePath)}");
+                    
                 }
             }
             catch (Exception ex)

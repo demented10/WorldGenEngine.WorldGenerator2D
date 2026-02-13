@@ -1,6 +1,7 @@
-﻿namespace WorldGenEngine.Visualization;
-
-internal interface IVisualisator
+﻿namespace WorldGenEngine.Visualization
 {
-    void Visualize();
+    internal interface IVisualisator
+    {
+        void Visualize();
+    }
 }

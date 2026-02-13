@@ -9,5 +9,6 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
     public interface IRectsFinder
     {
         List<Rect> FindRects(IMatrix matrix);
+        // IEnumerable<Rect> FindRects(IMatrix matrix);
     }
 }
