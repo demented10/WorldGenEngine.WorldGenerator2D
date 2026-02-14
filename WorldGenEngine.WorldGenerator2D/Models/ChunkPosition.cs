@@ -1,7 +1,9 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace WorldGenEngine.WorldGenerator2D.Models
 {
+    [Serializable]
     public readonly struct ChunkPosition : IEquatable<ChunkPosition>
     {
         public int ChunkXPos {get;}

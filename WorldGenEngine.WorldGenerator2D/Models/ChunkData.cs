@@ -1,5 +1,8 @@
+using System;
+
 namespace WorldGenEngine.WorldGenerator2D.Models
 {
+    [Serializable]
     public class ChunkData
     {
         public TileData[] Tiles {get;}

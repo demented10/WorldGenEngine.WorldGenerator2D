@@ -20,6 +20,14 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         /// Use to get the positions of all generated chunks. This method will be called by the world state service when it needs to determine which chunks have been generated and are currently stored in the storage. The implementation of this method should return a hash set containing the positions of all generated chunks, allowing the world generator to efficiently check if a chunk has already been generated or if it needs to be created. This can help optimize the chunk generation process and ensure that the world state is accurately maintained.
         /// </summary>
         /// <returns></returns>
-        public HashSet<ChunkPosition> GetGeneratedChunkPositions();
+        public HashSet<ChunkPosition> GetStoredChunkPositions();
+
+        /// <summary>
+        /// Returns a single chunk from the storage based on the provided chunk position. This method will be called by the world state service when it needs to retrieve the data for a specific chunk, such as when a chunk is being generated or when the world generator needs to access the current state of a particular chunk. The implementation of this method should handle the retrieval mechanism for a single chunk, whether it's loading from a file, a database, or any other form of persistent storage. The method should return the chunk data corresponding to the provided chunk position, allowing the world generator to access and manipulate the data for that specific chunk as needed.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="chunkData"></param>
+        /// <returns></returns>
+        public ChunkData LoadChunkData(ChunkPosition position);
     }
 }

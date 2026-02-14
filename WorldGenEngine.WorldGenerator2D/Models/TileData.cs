@@ -4,6 +4,7 @@ using System.Text;
 
 namespace WorldGenEngine.WorldGenerator2D.Models
 {
+    [Serializable]
     public struct TileData
     {
         public TileData(int tileId, bool isSolid)

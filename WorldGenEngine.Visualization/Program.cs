@@ -15,7 +15,7 @@ class Program
         var generator = MatrixGeneratorsFactory.CreatePerlinNoiseBinaryMatrixGenerator(PerlinNoiseConfigFactory.GetDefaultConfig());
         var rectFinder = RectFindersFactory.CreateRowDepthFinder();
 
-        IVisualisator visualisation = new RaylibVisualizer();
+        IVisualisator visualisation = new RaylibWorldStateVisualizer();
         visualisation.Visualize();
 
     }
