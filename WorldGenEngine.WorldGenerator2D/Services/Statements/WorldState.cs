@@ -1,29 +1,34 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using WorldGenEngine.WorldGenerator2D.Factories;
 using WorldGenEngine.WorldGenerator2D.Models;
 
 namespace WorldGenEngine.WorldGenerator2D.Services.Statements
 {
     [Serializable]
-    internal class WorldState
+    public class WorldState //TODO Разделить реализацию на кэш и менеджер чанков
     {
         private readonly Dictionary<ChunkPosition, ChunkState> _loadedChunks;
         private readonly HashSet<ChunkPosition> _existingChunks;
         private readonly IChunkStorageService _chunkStorageService;
         private readonly IChunkGenerationServiceFactory _chunkGenerationServiceFactory;
         private readonly WorldStateOptions _options;
+        private readonly ILogger<WorldState> _logger;
 
-        public WorldState(IChunkGenerationServiceFactory chunkGenerationServiceFactory, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options)
+        public WorldState(IChunkGenerationServiceFactory chunkGenerationServiceFactory, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options, ILogger<WorldState> logger = null)
         {
             _chunkGenerationServiceFactory = chunkGenerationServiceFactory;
             _chunkStorageService = chunkStorageService;
+            _logger = logger ?? NullLogger<WorldState>.Instance;
             _options = options.Value;
             _loadedChunks = new Dictionary<ChunkPosition, ChunkState>();
             _existingChunks = _chunkStorageService.GetStoredChunkPositions();
+            _logger.LogInformation($"WorldState initialized with {_existingChunks.Count} existing chunks in storage.");
         }
 
 
@@ -35,6 +40,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         /// <returns></returns>
         private bool CheckChunkIsLoaded(ChunkPosition position)
         {
+            _logger.LogDebug($"Check is chunk loaded at position: {position.ToString()}");
             return _loadedChunks.ContainsKey(position);
         }
         /// <summary>
@@ -44,6 +50,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         /// <returns></returns>
         private bool CheckChunkExistsInStorage(ChunkPosition position)
         {
+            _logger.LogDebug($"Check is chung exits in storage: {position.ToString()}");
             return _existingChunks.Contains(position);
         }
 
@@ -56,7 +63,8 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         /// <returns></returns>
         private IEnumerable<ChunkPosition> GetAroundPositions(ChunkPosition aroundChunk)
         {
-            for(int x = aroundChunk.ChunkXPos - _options.AroundChunkRadius; x <= aroundChunk.ChunkXPos + _options.AroundChunkRadius; x++)
+            _logger.LogDebug($"Getting around positions for chunk: {aroundChunk.ToString()} with radius: {_options.AroundChunkRadius}");
+            for (int x = aroundChunk.ChunkXPos - _options.AroundChunkRadius; x <= aroundChunk.ChunkXPos + _options.AroundChunkRadius; x++)
             {
                 for (int y = aroundChunk.ChunkYPos - _options.AroundChunkRadius; y <= aroundChunk.ChunkYPos + _options.AroundChunkRadius; y++)
                 {
@@ -74,11 +82,13 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         {
             try
             {
+                _logger.LogDebug($"Trying to load chunk from storage at position: {position.ToString()}");
                 state = new ChunkState(position,_chunkStorageService.LoadChunkData(position));
                 return true;
             }
             catch (Exception exception)
             {
+                _logger.LogError(exception, $"Failed to load chunk from storage at position: {position.ToString()}");
                 state = default;
                 return false;
             }
@@ -89,11 +99,13 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         {
             try
             {
+                _logger.LogDebug($"Trying to generate chunk at position: {position.ToString()}");
                 state = new ChunkState(position, _chunkGenerationServiceFactory.Create().GenerateChunkData(position));
                 return true;
             }
             catch (Exception exception)
             {
+                _logger.LogError(exception, $"Failed to generate chunk at position: {position.ToString()}");
                 state = default;
                 return false;
             }
@@ -109,7 +121,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         public List<ChunkState> GetChunksStates(ChunkPosition aroundChunk)
         {
             List<ChunkState> states = new List<ChunkState>();
-
+            _logger.LogInformation($"Getting chunk states around chunk: {aroundChunk.ToString()}");
             foreach (var chunkPosition in GetAroundPositions(aroundChunk))
             {
                 //Check if chunk is loaded in cache
@@ -121,6 +133,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
                     }
                     else
                     {
+                        _logger.LogError($"Chunk is marked as loaded in cache but failed to retrieve it at position: {chunkPosition.ToString()}");
                         continue; //TODO обработать ситуацию, когда TryGetValue возвращает false, хотя CheckChunkIsLoaded возвращает true
                     }
                 }
@@ -133,6 +146,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
                     }
                     else
                     {
+                        _logger.LogError($"Chunk is marked as existing in storage but failed to load it at position: {chunkPosition.ToString()}");
                         continue; //TODO обработать ситуацию, когда TryGetChunkData возвращает false, хотя CheckChunkExistsInStorage возвращает true
                     }
                 }
@@ -145,6 +159,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
                     }
                     else
                     {
+                        _logger.LogError($"Failed to generate chunk at position: {chunkPosition.ToString()}");
                         continue; //TODO обработать ситуацию, когда TryGenerateChunk возвращает false
                     }
                 }
@@ -156,6 +171,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
 
         private void AddChunkToCache(ChunkPosition position, ChunkState state)
         {
+            _logger.LogDebug($"Adding chunk to cache at position: {position.ToString()}");
             if (_loadedChunks.Count >= _options.AroundChunkRadius)
             {
                 //TODO удалить из кэша самый дальний от игрока чанк
@@ -169,6 +185,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         /// <param name="newStates"></param>
         public void SaveChunks(ChunkState[] newStates)
         {
+            _logger.LogInformation($"Saving {newStates.Length} chunks to storage.");
             SaveCacheToStorage();
             _existingChunks.Clear();
             _existingChunks.UnionWith(_chunkStorageService.GetStoredChunkPositions());
@@ -177,6 +194,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         }
         private void SaveCacheToStorage()
         {
+            _logger.LogDebug($"Saving {_loadedChunks.Count} loaded chunks from cache to storage.");
             _chunkStorageService.SaveChunkState(_loadedChunks.ToDictionary(kv => kv.Key, kv => kv.Value.Data));
         }
 

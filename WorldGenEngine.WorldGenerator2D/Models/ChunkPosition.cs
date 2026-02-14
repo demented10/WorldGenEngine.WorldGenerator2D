@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using System.Text;
 
 namespace WorldGenEngine.WorldGenerator2D.Models
 {
@@ -28,6 +29,11 @@ namespace WorldGenEngine.WorldGenerator2D.Models
         public override int GetHashCode()
         {
             return HashCode.Combine(ChunkXPos, ChunkYPos);
+        }
+
+        public override string ToString()
+        {
+            return $"ChunkXPos: {ChunkXPos}; ChunkYPos: {ChunkYPos}";
         }
     }
 

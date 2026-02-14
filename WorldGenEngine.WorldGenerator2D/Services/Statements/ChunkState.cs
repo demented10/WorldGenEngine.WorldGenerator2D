@@ -5,7 +5,7 @@ using WorldGenEngine.WorldGenerator2D.Models;
 namespace WorldGenEngine.WorldGenerator2D.Services.Statements
 {
     [Serializable]
-    internal class ChunkState : IEquatable<ChunkState>
+    public class ChunkState : IEquatable<ChunkState>
     {
         public readonly ChunkPosition Position;
         public readonly ChunkData Data;

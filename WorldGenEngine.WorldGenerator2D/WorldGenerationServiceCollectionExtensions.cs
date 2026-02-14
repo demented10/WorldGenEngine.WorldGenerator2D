@@ -7,6 +7,7 @@ using WorldGenEngine.WorldGenerator2D.Algorithms;
 using WorldGenEngine.WorldGenerator2D.Factories;
 using WorldGenEngine.WorldGenerator2D.Services.Generation;
 using WorldGenEngine.WorldGenerator2D.Services.Statements;
+using WorldGenEngine.WorldGenerator2D.Services.Storage;
 
 namespace WorldGenEngine.WorldGenerator2D
 {
@@ -35,6 +36,7 @@ namespace WorldGenEngine.WorldGenerator2D
             services.AddSingleton(Options.Create(stateOptions));
 
             services.AddSingleton<Factories.IChunkGenerationServiceFactory, Factories.ChunkGenerationServiceFactory>();
+            services.AddSingleton<IChunkStorageService, InMemoryChunkStorage>();
 
             services.AddScoped<WorldState>();
 
