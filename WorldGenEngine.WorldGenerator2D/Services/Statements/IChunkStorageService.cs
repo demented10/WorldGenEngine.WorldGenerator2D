@@ -15,7 +15,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         /// </summary>
         /// <param name="positions"></param>
         /// <returns></returns>
-        public Dictionary<ChunkPosition,ChunkData> LoadChunks(ChunkPosition[] positions);
+        public Dictionary<ChunkPosition,ChunkData> LoadChunks(ChunkPosition[] positions); //TODO возможно стоит сделать просто List<ChunkData>
         /// <summary>
         /// Use to get the positions of all generated chunks. This method will be called by the world state service when it needs to determine which chunks have been generated and are currently stored in the storage. The implementation of this method should return a hash set containing the positions of all generated chunks, allowing the world generator to efficiently check if a chunk has already been generated or if it needs to be created. This can help optimize the chunk generation process and ensure that the world state is accurately maintained.
         /// </summary>

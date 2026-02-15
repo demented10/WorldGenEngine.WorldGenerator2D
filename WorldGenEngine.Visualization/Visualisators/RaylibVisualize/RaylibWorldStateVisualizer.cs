@@ -29,6 +29,8 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 
         private WorldState _worldState;
 
+        public bool _needUpdate = true;
+
         public RaylibWorldStateVisualizer(IChunkGenerationServiceFactory chunkGenerationServiceFactory, WorldState worldState)
         {
             _chunkGenerationServiceFactory = chunkGenerationServiceFactory;
@@ -105,9 +107,10 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
                 }
                 Raylib.DrawTextEx(_font,"Chunk Generation", new Vector2(-80,20), 20,1, Color.Black);
 
-                if (_loadedChunks != null && _loadedChunks.Count > 0)
+                if (_loadedChunks != null && _loadedChunks.Count > 0 && _needUpdate)
                 {
                     VisualizeLoadedChunks();
+                    _needUpdate = false;
                 }
 
                 Raylib.EndMode2D();

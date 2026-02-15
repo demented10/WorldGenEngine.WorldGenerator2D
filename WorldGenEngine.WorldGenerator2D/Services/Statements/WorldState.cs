@@ -5,32 +5,34 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Threading.Tasks;
 using WorldGenEngine.WorldGenerator2D.Factories;
 using WorldGenEngine.WorldGenerator2D.Models;
 
 namespace WorldGenEngine.WorldGenerator2D.Services.Statements
 {
     [Serializable]
-    public class WorldState //TODO Разделить реализацию на кэш и менеджер чанков
+    public class WorldState
     {
-        private readonly Dictionary<ChunkPosition, ChunkState> _loadedChunks;
-        private readonly HashSet<ChunkPosition> _existingChunks;
+        //private readonly Dictionary<ChunkPosition, ChunkState> _loadedChunks;
+        //private readonly HashSet<ChunkPosition> _existingChunks;
+
         private readonly IChunkStorageService _chunkStorageService;
         private readonly IChunkGenerationServiceFactory _chunkGenerationServiceFactory;
+        private readonly IChunkCachingService _chunkCachingService;
         private readonly WorldStateOptions _options;
         private readonly ILogger<WorldState> _logger;
         private readonly WorldGenerationOptions _generationOptions;
 
-        public WorldState(IChunkGenerationServiceFactory chunkGenerationServiceFactory, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options, IOptions<WorldGenerationOptions> generationOptions, ILogger<WorldState> logger = null)
+        public WorldState(IChunkGenerationServiceFactory chunkGenerationServiceFactory, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options, IOptions<WorldGenerationOptions> generationOptions, IChunkCachingService chunkCachingService, ILogger<WorldState> logger = null)
         {
             _chunkGenerationServiceFactory = chunkGenerationServiceFactory;
             _chunkStorageService = chunkStorageService;
+            _chunkCachingService = chunkCachingService;
             _generationOptions = generationOptions.Value;
             _logger = logger ?? NullLogger<WorldState>.Instance;
             _options = options.Value;
-            _loadedChunks = new Dictionary<ChunkPosition, ChunkState>();
-            _existingChunks = _chunkStorageService.GetStoredChunkPositions();
-            _logger.LogInformation($"WorldState initialized with {_existingChunks.Count} existing chunks in storage.");
+            _logger.LogInformation($"WorldState initialized with {_chunkStorageService.GetStoredChunkPositions()} existing chunks in storage.");
         }
 
 
@@ -43,7 +45,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         private bool CheckChunkIsLoaded(ChunkPosition position)
         {
             _logger.LogDebug($"Check is chunk loaded at position: {position.ToString()}");
-            return _loadedChunks.ContainsKey(position);
+            return _chunkCachingService.IsChunkPositionCached(position);
         }
         /// <summary>
         /// Check is chunk exists in storage
@@ -53,7 +55,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         private bool CheckChunkExistsInStorage(ChunkPosition position)
         {
             _logger.LogDebug($"Check is chung exits in storage: {position.ToString()}");
-            return _existingChunks.Contains(position);
+            return _chunkStorageService.GetStoredChunkPositions().Contains(position);
         }
 
 
@@ -112,14 +114,10 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
                 return false;
             }
         }
-        private void AddChunkToCache(ChunkPosition position, ChunkState state)
+        private void AddChunkToCache(ChunkState state)
         {
-            _logger.LogDebug($"Adding chunk to cache at position: {position.ToString()}");
-            if (_loadedChunks.Count >= _options.AroundChunkRadius)
-            {
-                //TODO удалить из кэша самый дальний от игрока чанк
-            }
-            _loadedChunks[state.Position] = state;
+            _logger.LogDebug($"Adding chunk to cache at position: {state.Position.ToString()}");
+            _chunkCachingService.AddChunkToCache(state.Position,state.Data);
         }
 
         /// <summary>
@@ -138,9 +136,9 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
                 //Check if chunk is loaded in cache
                 if (CheckChunkIsLoaded(chunkPosition))
                 {
-                    if (_loadedChunks.TryGetValue(chunkPosition, out var value))
+                    if (_chunkCachingService.TryGetChunkData(chunkPosition, out var value))
                     {
-                        states.Add(value);
+                        states.Add(new ChunkState(chunkPosition, value));
                     }
                     else
                     {
@@ -153,7 +151,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
                     if (TryLoadChunkFromStorage(chunkPosition, out var state))
                     {
                         states.Add(state);
-                        _loadedChunks[state.Position] = state;
+                        _chunkCachingService.AddChunkToCache(state.Position, state.Data);
                     }
                     else
                     {
@@ -166,7 +164,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
                     if (TryGenerateChunk(chunkPosition, out var state))
                     {
                         states.Add(state);
-                        AddChunkToCache(state.Position, state);
+                        AddChunkToCache(state);
                     }
                     else
                     {
@@ -188,16 +186,9 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         public void SaveChunks(ChunkState[] newStates)
         {
             _logger.LogInformation($"Saving {newStates.Length} chunks to storage.");
-            SaveCacheToStorage();
-            _existingChunks.Clear();
-            _existingChunks.UnionWith(_chunkStorageService.GetStoredChunkPositions());
+            _logger.LogDebug($"Saving {_chunkCachingService.GetCachedChunksCount()} loaded chunks from cache to storage.");
+            _chunkStorageService.SaveChunkState(_chunkCachingService.GetLoadedChunks());
         }
-        private void SaveCacheToStorage()
-        {
-            _logger.LogDebug($"Saving {_loadedChunks.Count} loaded chunks from cache to storage.");
-            _chunkStorageService.SaveChunkState(_loadedChunks.ToDictionary(kv => kv.Key, kv => kv.Value.Data));
-        }
-
 
     }
 }
