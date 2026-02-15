@@ -35,7 +35,7 @@ class Program
             options.Seed = 42;
         }, options =>
         {
-            options.AroundChunkRadius = 4;
+            options.AroundChunkRadius = 15;
             options.MaxLoadedChunks = 64;
         });
         using var serviceProvider = services.BuildServiceProvider();

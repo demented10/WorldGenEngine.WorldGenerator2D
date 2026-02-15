@@ -35,7 +35,7 @@ namespace WorldGenEngine.WorldGenerator2D
             worldStateOptions?.Invoke(stateOptions);
             services.AddSingleton(Options.Create(stateOptions));
 
-            services.AddSingleton<Factories.IChunkGenerationServiceFactory, Factories.ChunkGenerationServiceFactory>();
+            services.AddSingleton<IChunkGenerationServiceFactory, ChunkGenerationServiceFactory>();
             services.AddSingleton<IChunkStorageService, InMemoryChunkStorage>();
 
             services.AddScoped<WorldState>();

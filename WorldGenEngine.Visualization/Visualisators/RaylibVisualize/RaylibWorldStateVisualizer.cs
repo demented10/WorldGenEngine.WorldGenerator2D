@@ -15,7 +15,7 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
     public class RaylibWorldStateVisualizer : IVisualisator
     {
         private bool _isInitialized = false;
-        private int _chunkSize = 5; // Размер одного тайла в пикселях
+        private int _tileSize = 5; // Размер одного тайла в пикселях
         private Color _solidTileColor = Color.DarkGray;
         private Color _emptyTileColor = Color.LightGray;
         private Font _font;
@@ -23,7 +23,7 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
         private ChunkData _chunkData;
 
         private Camera2D _camera;
-
+        private List<ChunkState> _loadedChunks;
         public static int ScreenWidth = 800;
         public static int ScreenHeight = 600;
 
@@ -75,6 +75,7 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
                     _camera.Target.X -= delta.X;
                     _camera.Target.Y -= delta.Y;
                 }
+
                 // Зум (колесо мыши)
                 float wheel = Raylib.GetMouseWheelMove();
                 if (wheel != 0)
@@ -103,16 +104,28 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
                     Raylib.DrawLineV(new Vector2(-1000, i * 100), new Vector2(1000, i * 100), Color.LightGray);
                 }
                 Raylib.DrawTextEx(_font,"Chunk Generation", new Vector2(-80,20), 20,1, Color.Black);
-                VisualizeChunk(_chunkData);
+
+                if (_loadedChunks != null && _loadedChunks.Count > 0)
+                {
+                    VisualizeLoadedChunks();
+                }
 
                 Raylib.EndMode2D();
 
 
-                if (Raygui.GuiButton(new Rectangle(ScreenWidth-200, ScreenHeight-60, 150, 30), "Regenerate Chunk") == 1)
+                //if (Raygui.GuiButton(new Rectangle(ScreenWidth-200, ScreenHeight-60, 150, 30), "Regenerate Chunk") == 1)
+               // {
+                    //  _chunkData = _chunkGenerationServiceFactory.Create(GeneratorType.Random).GenerateChunkData(new ChunkPosition(0, 0));
+                //}
+                if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 125, 150, 30), "Load Chunks") == 1)
                 {
-                    _chunkData = _chunkGenerationServiceFactory.Create(GeneratorType.Random).GenerateChunkData(new ChunkPosition(0, 0));
+                    _loadedChunks = _worldState.GetChunksStates(new ChunkPosition(0, 0));
                 }
-                
+                if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 155, 150, 30), "Save Chunks") == 1)
+                {
+                    _worldState.SaveChunks(_loadedChunks.ToArray());
+                }
+
                 Raylib.EndDrawing();
             }
 
@@ -121,16 +134,24 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
             Raylib.CloseWindow();
         }
 
-        public void VisualizeChunk(ChunkData chunkData)
+        public void VisualizeLoadedChunks()
         {
+            foreach (var chunkState in _loadedChunks)
+            {
+                VisualizeChunk(chunkState.Data, chunkState.Position);
+            }
+        }
 
+        public void VisualizeChunk(ChunkData chunkData, ChunkPosition chunkPosition)
+        {
+            
             for (int y = 0; y < ChunkData.ChunkSize; y++)
             {
                 for (int x = 0; x < ChunkData.ChunkSize; x++)
                 {
                     TileData tile = chunkData.Tiles[y * ChunkData.ChunkSize + x];
                     Color tileColor = tile.IsSolid ? _solidTileColor : _emptyTileColor;
-                    Raylib.DrawRectangle(x * _chunkSize, y * _chunkSize, _chunkSize, _chunkSize, tileColor);
+                    Raylib.DrawRectangle((_tileSize*x) + (chunkPosition.ChunkXPos * ChunkData.ChunkSize), (_tileSize * y) + (chunkPosition.ChunkYPos * ChunkData.ChunkSize), _tileSize, _tileSize, tileColor);
                 }
             }
         }
