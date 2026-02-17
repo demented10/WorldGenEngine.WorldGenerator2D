@@ -5,7 +5,7 @@ namespace WorldGenEngine.Core.MatrixGeneration.Models
     /// <summary>
     /// Model implementing a binary matrix
     /// </summary>
-    public readonly struct BinaryMatrix : IMatrix
+    public class BinaryMatrix : IMatrix
     {
         /// <summary>
         /// Model implementing a binary matrix

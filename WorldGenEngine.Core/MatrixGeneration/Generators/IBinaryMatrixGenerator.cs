@@ -6,6 +6,6 @@
     /// </summary>
     public interface IBinaryMatrixGenerator
     {
-        bool[] GenerateMatrix(int width, int height);
+        bool[] GenerateMatrix(int width, int height, int? seed = null);
     }
 }

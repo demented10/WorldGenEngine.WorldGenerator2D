@@ -10,5 +10,7 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
     {
         List<Rect> FindRects(IMatrix matrix);
         // IEnumerable<Rect> FindRects(IMatrix matrix);
+        List<Rect> FindRects(bool[,] matrix);
     }
+    
 }

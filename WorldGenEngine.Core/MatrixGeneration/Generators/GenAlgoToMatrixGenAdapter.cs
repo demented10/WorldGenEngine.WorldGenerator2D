@@ -16,7 +16,8 @@ namespace WorldGenEngine.Core.MatrixGeneration.Generators
         {
             _generationAlgo = generationAlgo;
         }
-        public bool[] GenerateMatrix(int width, int height)
+
+        public bool[] GenerateMatrix(int width, int height, int? seed = null)
         {
             var map = _generationAlgo.GenerateMap(width, height);
             bool[] matrix = new bool[width * height];

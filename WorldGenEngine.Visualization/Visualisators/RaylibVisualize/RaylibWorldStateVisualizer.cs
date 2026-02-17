@@ -107,10 +107,9 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
                 }
                 Raylib.DrawTextEx(_font,"Chunk Generation", new Vector2(-80,20), 20,1, Color.Black);
 
-                if (_loadedChunks != null && _loadedChunks.Count > 0 && _needUpdate)
+                if (_loadedChunks != null && _loadedChunks.Count > 0)
                 {
-                    VisualizeLoadedChunks();
-                    _needUpdate = false;
+                    VisualizeLoadedChunks(_camera);
                 }
 
                 Raylib.EndMode2D();
@@ -137,11 +136,45 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
             Raylib.CloseWindow();
         }
 
-        public void VisualizeLoadedChunks()
+        public static Rectangle GetCameraViewRect(Camera2D camera)
         {
+            // Размеры экрана в пикселях
+            float screenWidth = Raylib.GetScreenWidth();
+            float screenHeight = Raylib.GetScreenHeight();
+
+            // Левый верхний угол экрана в мировых координатах
+            Vector2 topLeft = Raylib.GetScreenToWorld2D(new Vector2(0, 0), camera);
+            // Правый нижний угол экрана в мировых координатах
+            Vector2 bottomRight = Raylib.GetScreenToWorld2D(new Vector2(screenWidth, screenHeight), camera);
+
+            // Возвращаем прямоугольник, описывающий видимую область в мире
+            return new Rectangle(
+                topLeft.X,
+                topLeft.Y,
+                bottomRight.X - topLeft.X,
+                bottomRight.Y - topLeft.Y
+            );
+        }
+
+        public void VisualizeLoadedChunks(Camera2D camera)
+        {
+            // Вычисляем видимую область в мировых координатах
+            Rectangle viewRect = GetCameraViewRect(camera);
+
             foreach (var chunkState in _loadedChunks)
             {
-                VisualizeChunk(chunkState.Data, chunkState.Position);
+                // Прямоугольник чанка
+                Rectangle chunkRect = new Rectangle(
+                    chunkState.Position.ChunkXPos * ChunkData.ChunkSize * _tileSize,
+                    chunkState.Position.ChunkYPos * ChunkData.ChunkSize * _tileSize,
+                    ChunkData.ChunkSize * _tileSize,
+                    ChunkData.ChunkSize * _tileSize
+                );
+
+                if (Raylib.CheckCollisionRecs(viewRect, chunkRect))
+                {
+                    VisualizeChunk(chunkState.Data, chunkState.Position);
+                }
             }
         }
 

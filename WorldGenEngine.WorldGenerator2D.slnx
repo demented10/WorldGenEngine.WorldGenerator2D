@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="WorldGenEngine.Core/WorldGenEngine.Core.csproj" Id="f5698175-cd29-462b-ba61-05630603848c" />
+  <Project Path="WorldGenEngine.Tests/WorldGenEngine.Tests.csproj" Id="fba71ede-4d82-40c4-a0b9-550b70d9e71b" />
   <Project Path="WorldGenEngine.Visualization/WorldGenEngine.Visualization.csproj" Id="74be5849-3541-4f11-9ed5-72399ba3c9c3" />
   <Project Path="WorldGenEngine.WorldGenerator2D/WorldGenEngine.WorldGenerator2D.csproj" />
 </Solution>

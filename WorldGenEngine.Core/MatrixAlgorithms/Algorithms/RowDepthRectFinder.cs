@@ -25,6 +25,16 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
                 }
             }
         }
+        private static void ClearRectInMatrix(bool[,] matrix, Rect rect)
+        {
+            for (int xI = 0; xI < rect.Width; xI++)
+            {
+                for (int yI = 0; yI < rect.Height; yI++)
+                {
+                    matrix[xI + rect.X, yI + rect.Y] = false;
+                }
+            }
+        }
 
         /// <summary>
         /// Find a rectangle that includes all true occurrences
@@ -52,6 +62,48 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
                 var curY = startY;
                 //We launch a passage into the depths
                 while (curY < matrixHeight && matrix[MatrixUtils.Compare2DimToIndex(matrixWidth, curX, curY)])
+                {
+                    var curHeight = curY - startY;
+
+                    //If the current height is equal to the minimum column height, then we exit the column aisle
+                    if (curHeight >= rectHeight)
+                    {
+                        break;
+                    }
+
+                    curY++;
+                }
+
+                var columnHeight = curY - startY;
+                if (columnHeight <= rectHeight) rectHeight = columnHeight;
+                rectWidth++;
+                curX++;
+            }
+
+            Rect rect = new Rect(startX, startY, rectWidth, rectHeight);
+            return rect;
+        }
+
+        private static Rect FindLocalRect(int x, int y, bool[,] matrix)
+        {
+            var curX = x;
+
+            var startX = x;
+            var startY = y;
+
+            var matrixHeight = matrix.GetLength(1);
+            var matrixWidth = matrix.GetLength(0);
+
+            var rectWidth = 0;
+            int rectHeight = matrixHeight;
+
+            //We start a loop to iterate over the line
+            while (curX < matrixWidth &&
+                   matrix[curX, startY])
+            {
+                var curY = startY;
+                //We launch a passage into the depths
+                while (curY < matrixHeight && matrix[curX, curY])
                 {
                     var curHeight = curY - startY;
 
@@ -108,5 +160,30 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
         }
 
 
+        public List<Rect> FindRects(bool[,] matrix)
+        {
+            var matrixWidth = matrix.GetLength(0);
+            var matrixHeight = matrix.GetLength(1);
+
+            var m = (bool[,])matrix.Clone();
+            var rects = new List<Rect>();
+
+            for (int y = 0; y < matrixHeight; y++)
+            {
+                for (int x = 0; x < matrixWidth; x++)
+                {
+                    //Finding the first true occurrence
+                    if (matrix[x, y])
+                    {
+                        Rect rect = FindLocalRect(x, y, m);
+                        rects.Add(rect);
+                        ClearRectInMatrix(m, rect);
+                        x += rect.Width - 1;
+                    }
+                }
+            }
+
+            return rects;
+        }
     }
 }

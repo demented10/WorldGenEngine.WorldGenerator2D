@@ -6,9 +6,9 @@
     /// </summary>
     internal class RandomMatrixGenerator : IBinaryMatrixGenerator
     {
-        public bool[] GenerateMatrix(int width, int height)
+        public bool[] GenerateMatrix(int width, int height, int? seed = null)
         {
-            Random rand = new Random();
+            Random rand = seed.HasValue ? new Random(seed.Value) : new Random();
 
             var matrix = new bool[width * height];
 
