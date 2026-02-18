@@ -20,10 +20,10 @@ public static class CoreServiceCollectionExtensions
 {
     public static IServiceCollection AddWorldGenEngine(this IServiceCollection services)
     {
-        services.AddSingleton<IMatrix, BinaryMatrix>();
+        services.AddScoped<IMatrix, BinaryMatrix>();
         services.AddSingleton<IRectsFinder, RowDepthRectFinder>();
         services.AddSingleton<IBinaryMatrixGenerator, RandomMatrixGenerator>();
-        services.AddSingleton<GenAlgoToMatrixGenAdapter>();
+        services.AddSingleton<GenAlgoToMatrixGenAdapter >();
 
         return services;
     }

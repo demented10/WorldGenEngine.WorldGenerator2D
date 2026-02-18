@@ -19,9 +19,7 @@ class Program
 
     public  static void  Main(string[] args)
     {
-        var generator = MatrixGeneratorsFactory.CreatePerlinNoiseBinaryMatrixGenerator(PerlinNoiseConfigFactory.GetDefaultConfig());
-        var rectFinder = RectFindersFactory.CreateRowDepthFinder();
-
+        
         var services = new ServiceCollection();
         services.AddLogging(builder =>
         {
