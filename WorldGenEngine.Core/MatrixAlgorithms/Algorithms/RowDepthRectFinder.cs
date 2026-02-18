@@ -151,7 +151,7 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
                         Rect rect = FindLocalRect(x, y, matrixWidth, matrixHeight, m);
                         rects.Add(rect);
                         ClearRectInMatrix(matrixWidth, m, rect);
-                        x += rect.Width - 1;
+                        if (rect.Width > 0) x += rect.Width - 1;
                     }
                 }
             }
@@ -178,7 +178,7 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
                         Rect rect = FindLocalRect(x, y, m);
                         rects.Add(rect);
                         ClearRectInMatrix(m, rect);
-                        x += rect.Width - 1;
+                        if(rect.Width>0)x += rect.Width - 1;
                     }
                 }
             }
