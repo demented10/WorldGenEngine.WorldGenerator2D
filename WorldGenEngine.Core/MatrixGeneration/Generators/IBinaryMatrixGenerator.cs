@@ -8,4 +8,9 @@
     {
         bool[] GenerateMatrix(int width, int height, int? seed = null);
     }
+
+    public interface IHeightMapMatrixGenerator
+    {
+        float[] GenerateHeightMap(int width, int height, int? seed = null);
+    }
 }

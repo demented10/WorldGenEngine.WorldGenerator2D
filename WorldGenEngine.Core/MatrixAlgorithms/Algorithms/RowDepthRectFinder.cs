@@ -173,7 +173,7 @@ namespace WorldGenEngine.Core.MatrixAlgorithms.Algorithms
                 for (int x = 0; x < matrixWidth; x++)
                 {
                     //Finding the first true occurrence
-                    if (matrix[x, y])
+                    if (m[x, y])
                     {
                         Rect rect = FindLocalRect(x, y, m);
                         rects.Add(rect);

@@ -9,6 +9,7 @@ namespace WorldGenEngine.Core;
 public enum RectFinderAlgorithmTypes
 {
     RowDepth = 0,
+    PerlinNoise = 1,
 }
 
 public class RectFinderOptions
@@ -23,7 +24,7 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IMatrix, BinaryMatrix>();
         services.AddSingleton<IRectsFinder, RowDepthRectFinder>();
         services.AddSingleton<IBinaryMatrixGenerator, RandomMatrixGenerator>();
-        services.AddSingleton<GenAlgoToMatrixGenAdapter >();
+        services.AddSingleton<IBinaryMatrixGenerator, PerlinNoiseMatrixGenerator>();
 
         return services;
     }

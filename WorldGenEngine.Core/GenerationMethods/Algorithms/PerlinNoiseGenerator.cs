@@ -4,6 +4,7 @@ using WorldGenEngine.Core.GenerationMethods.Configs;
 
 namespace WorldGenEngine.Core.GenerationMethods.Algorithms
 {
+
     internal class PerlinNoiseGenerator : IGenerationAlgo
     {
         private readonly float _scale = 0.025f; //масштаб шума (чем меньше, тем больше пещеры)
@@ -181,8 +182,11 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
         /// </summary>
         /// <param name="sizeX"></param>
         /// <param name="sizeY"></param>
+        /// <param name="positionX"></param>
+        /// <param name="positionY"></param>
+        /// <param name="seed"></param>
         /// <returns>Массив bool где True - стена, False - пустота  </returns>
-        public bool[,] GenerateMap(int sizeX, int sizeY)
+        public bool[,] GenerateMap(int sizeX, int sizeY, int positionX = 0, int positionY = 0, int seed = 0)
         {
             var map = new bool[sizeX, sizeY];
 
@@ -195,7 +199,7 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
             {
                 for (var y = 0; y < sizeY; y++)
                 {
-                    var noiseValue = FractalNoise(x * _scale, y * _scale);
+                    var noiseValue = FractalNoise(x+positionX * _scale, y+positionY * _scale);
                     noiseMap[x, y] = noiseValue;
 
                     if (noiseValue < min) min = noiseValue;
@@ -222,5 +226,27 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
             return map;
         }
 
+        public float[,] GenerateHeightMap(int sizeX, int sizeY, int positionX = 0, int positionY = 0, int seed = 0)
+        {
+
+            var noiseMap = new float[sizeX, sizeY];
+
+            var min = float.MaxValue;
+            var max = float.MinValue;
+
+            for (var x = 0; x < sizeX; x++)
+            {
+                for (var y = 0; y < sizeY; y++)
+                {
+                    var noiseValue = FractalNoise(x + positionX * _scale, y + positionY * _scale);
+                    noiseMap[x, y] = noiseValue;
+
+                    if (noiseValue < min) min = noiseValue;
+                    if (noiseValue > max) max = noiseValue;
+                }
+            }
+
+            return noiseMap;
+        }
     }
 }
