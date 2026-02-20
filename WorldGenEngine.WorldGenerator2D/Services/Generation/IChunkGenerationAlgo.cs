@@ -2,7 +2,7 @@
 
 namespace WorldGenEngine.WorldGenerator2D.Services.Generation
 {
-    internal interface IChunkGenerationAlgo
+    public interface IChunkGenerationAlgo
     {
         ChunkData GenerateChunk(ChunkPosition position, int seed = 0);
     }

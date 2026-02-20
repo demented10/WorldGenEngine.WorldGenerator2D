@@ -3,6 +3,9 @@ using WorldGenEngine.Core.GenerationMethods.Algorithms;
 using WorldGenEngine.Core.MatrixAlgorithms.Algorithms;
 using WorldGenEngine.Core.MatrixGeneration.Generators;
 using WorldGenEngine.Core.MatrixGeneration.Models;
+using WorldGenEngine.Core.Noise;
+using WorldGenEngine.Core.Noise.Config;
+using WorldGenEngine.Core.Noise.NoiseAlgorithms;
 
 namespace WorldGenEngine.Core;
 
@@ -19,12 +22,21 @@ public class RectFinderOptions
 
 public static class CoreServiceCollectionExtensions
 {
-    public static IServiceCollection AddWorldGenEngine(this IServiceCollection services)
+    public static IServiceCollection AddWorldGenEngine(this IServiceCollection services,
+        Action<FractalNoiseServiceConfig> fractalNoiseConfig = null)
+
     {
+
+        var fractalOptions = new FractalNoiseServiceConfig();
+        fractalNoiseConfig?.Invoke(fractalOptions);
+        services.AddSingleton(fractalOptions);
+
         services.AddScoped<IMatrix, BinaryMatrix>();
         services.AddSingleton<IRectsFinder, RowDepthRectFinder>();
         services.AddSingleton<IBinaryMatrixGenerator, RandomMatrixGenerator>();
         services.AddSingleton<IBinaryMatrixGenerator, PerlinNoiseMatrixGenerator>();
+        services.AddSingleton<INoise, PerlinNoise>();
+        services.AddSingleton<FractalNoiseService>();
 
         return services;
     }

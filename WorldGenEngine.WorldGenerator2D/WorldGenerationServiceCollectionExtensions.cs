@@ -26,7 +26,7 @@ namespace WorldGenEngine.WorldGenerator2D
     }
     public static class WorldGenerationServiceCollectionExtensions
     {
-        public static IServiceCollection AddWorldGeneration2D(this IServiceCollection services, Action<WorldGenerationOptions> worldGenerationOptions = null, Action<WorldStateOptions> worldStateOptions = null)
+        public static IServiceCollection AddWorldGeneration2D(this IServiceCollection services, Action<WorldGenerationOptions> worldGenerationOptions = null, Action<WorldStateOptions> worldStateOptions = null, Action<PerlinNoiseChunkGeneratorConfig> chunkGenerationConfig = null)
         {
             var generationOptions = new WorldGenerationOptions();
             worldGenerationOptions?.Invoke(generationOptions);
@@ -36,7 +36,12 @@ namespace WorldGenEngine.WorldGenerator2D
             worldStateOptions?.Invoke(stateOptions);
             services.AddSingleton(Options.Create(stateOptions));
 
-            services.AddSingleton<IChunkGenerationServiceFactory, ChunkGenerationServiceFactory>();
+            var chunkGenerationOptions = new PerlinNoiseChunkGeneratorConfig();
+            chunkGenerationConfig?.Invoke(chunkGenerationOptions);
+            services.AddSingleton(Options.Create(chunkGenerationOptions));
+
+
+            services.AddSingleton<IChunkGenerationAlgo, PerlinNoiseChunkGenerator>();
             services.AddSingleton<IChunkStorageService, InMemoryChunkStorage>();
             services.AddSingleton<IChunkCachingService, MemoryCachingService>();
 

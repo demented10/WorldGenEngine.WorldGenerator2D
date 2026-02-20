@@ -19,8 +19,6 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
         private Color _solidTileColor = Color.DarkGray;
         private Color _emptyTileColor = Color.LightGray;
         private Font _font;
-        private IChunkGenerationServiceFactory _chunkGenerationServiceFactory;
-        private ChunkData _chunkData;
 
         private Camera2D _camera;
         private List<ChunkState> _loadedChunks;
@@ -31,9 +29,8 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 
         public bool _needUpdate = true;
 
-        public RaylibWorldStateVisualizer(IChunkGenerationServiceFactory chunkGenerationServiceFactory, WorldState worldState)
+        public RaylibWorldStateVisualizer( WorldState worldState)
         {
-            _chunkGenerationServiceFactory = chunkGenerationServiceFactory;
             _worldState = worldState;
             Init();
         }
@@ -49,7 +46,6 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 
             // Рекомендуется включить фильтрацию для четкости (опционально)
             Raylib.SetTextureFilter(_font.Texture, TextureFilter.Bilinear);
-            _chunkData = _chunkGenerationServiceFactory.Create(GeneratorType.Random).GenerateChunkData(new ChunkPosition(0, 0));
             _camera = new Camera2D
             {
                 Target = new Vector2(0, 0),
@@ -158,23 +154,12 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 
         public void VisualizeLoadedChunks(Camera2D camera)
         {
-            // Вычисляем видимую область в мировых координатах
-            Rectangle viewRect = GetCameraViewRect(camera);
 
             foreach (var chunkState in _loadedChunks)
             {
-                // Прямоугольник чанка
-                Rectangle chunkRect = new Rectangle(
-                    chunkState.Position.ChunkXPos * ChunkData.ChunkSize * _tileSize,
-                    chunkState.Position.ChunkYPos * ChunkData.ChunkSize * _tileSize,
-                    ChunkData.ChunkSize * _tileSize,
-                    ChunkData.ChunkSize * _tileSize
-                );
+                    
+                VisualizeChunk(chunkState.Data, chunkState.Position);
 
-                if (Raylib.CheckCollisionRecs(viewRect, chunkRect))
-                {
-                    VisualizeChunk(chunkState.Data, chunkState.Position);
-                }
             }
         }
 

@@ -34,6 +34,7 @@ namespace WorldGenEngine.WorldGenerator2D.Factories
             IChunkGenerationAlgo chunkGenerationService = type switch
             {
                 GeneratorType.Random => new RandomChunkGenerator(),
+               //GeneratorType.PerlinNoise => new PerlinNoiseChunkGenerator(),
                 _ => throw new NotSupportedException($"Generator type {actualType} is not supported.")
             };
             return new ChunkGenerationService(chunkGenerationService, _options.Seed);

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WorldGenEngine.WorldGenerator2D.Factories;
 using WorldGenEngine.WorldGenerator2D.Models;
+using WorldGenEngine.WorldGenerator2D.Services.Generation;
 
 namespace WorldGenEngine.WorldGenerator2D.Services.Statements
 {
@@ -18,23 +19,22 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         //private readonly HashSet<ChunkPosition> _existingChunks;
 
         private readonly IChunkStorageService _chunkStorageService;
-        private readonly IChunkGenerationServiceFactory _chunkGenerationServiceFactory;
         private readonly IChunkCachingService _chunkCachingService;
         private readonly WorldStateOptions _options;
         private readonly ILogger<WorldState> _logger;
         private readonly WorldGenerationOptions _generationOptions;
+        private readonly IChunkGenerationAlgo _generationAlgo;
 
-        public WorldState(IChunkGenerationServiceFactory chunkGenerationServiceFactory, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options, IOptions<WorldGenerationOptions> generationOptions, IChunkCachingService chunkCachingService, ILogger<WorldState> logger = null)
+        public WorldState(IChunkGenerationAlgo generationAlgo, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options, IOptions<WorldGenerationOptions> generationOptions, IChunkCachingService chunkCachingService, ILogger<WorldState> logger = null)
         {
-            _chunkGenerationServiceFactory = chunkGenerationServiceFactory;
             _chunkStorageService = chunkStorageService;
             _chunkCachingService = chunkCachingService;
             _generationOptions = generationOptions.Value;
+            _generationAlgo = generationAlgo;
             _logger = logger ?? NullLogger<WorldState>.Instance;
             _options = options.Value;
             _logger.LogInformation($"WorldState initialized with {_chunkStorageService.GetStoredChunkPositions()} existing chunks in storage.");
         }
-
 
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
             try
             {
                 _logger.LogDebug($"Trying to generate chunk at position: {position.ToString()}");
-                state = new ChunkState(position, _chunkGenerationServiceFactory.Create(_generationOptions.GeneratorType).GenerateChunkData(position));
+                state = new ChunkState(position, _generationAlgo.GenerateChunk(position, _generationOptions.Seed));
                 return true;
             }
             catch (Exception exception)

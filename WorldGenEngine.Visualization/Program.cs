@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using Microsoft.Extensions.Logging;
+using WorldGenEngine.Core;
 using WorldGenEngine.Core.GenerationMethods.Configs;
 using WorldGenEngine.Core.MatrixAlgorithms.Factory;
 using WorldGenEngine.Core.MatrixGeneration.Factories;
@@ -26,21 +27,30 @@ class Program
             builder.AddConsole();
             builder.SetMinimumLevel(LogLevel.Debug);
         });
-
+        services.AddWorldGenEngine(config =>
+        {
+            config.Lacunarity = 1.25f;
+            config.Octaves = 2;
+            config.Persistence = 0.45f;
+        });
         services.AddWorldGeneration2D(worldGenerationOptions: options =>
         {
             options.GeneratorType = GeneratorType.Random;
-            options.Seed = 42;
+            options.Seed = 5;
         }, options =>
         {
-            options.AroundChunkRadius = 15;
-            options.MaxLoadedChunks = 64;
+            options.AroundChunkRadius = 5;
+            options.MaxLoadedChunks = 100;
+        }, config =>
+        {
+            config.Scale = 0.25f;
+            config.Threshold = -0.01f;
         });
+
         using var serviceProvider = services.BuildServiceProvider();
-        var generationServiceFactory = serviceProvider.GetRequiredService<IChunkGenerationServiceFactory>();
         var worldState = serviceProvider.GetRequiredService<WorldState>();
 
-        IVisualisator visualizator = new RaylibWorldStateVisualizer(generationServiceFactory, worldState);
+        IVisualisator visualizator = new RaylibWorldStateVisualizer(worldState);
         visualizator.Visualize();
 
 
