@@ -1,0 +1,7 @@
+{
+  "name": "com.mormot.worldgen.worldgenerator2d",
+  "version": "1.0.0",
+  "displayName": "WorldGen 2D Generator",
+  "description": "WordlEngine adopted to 2D generation",
+  "unity": "2021.3"
+}

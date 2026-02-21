@@ -1,8 +1,7 @@
 ﻿
-using WorldGenEngine.Core.GenerationMethods.Configs;
 
 
-namespace WorldGenEngine.Core.GenerationMethods.Algorithms
+namespace WorldGenEngine.Core.GenerationMethods
 {
 
     internal class PerlinNoiseGenerator : IGenerationAlgo
@@ -49,18 +48,6 @@ namespace WorldGenEngine.Core.GenerationMethods.Algorithms
             _lacunarity = lacunarity;
             _seed = seed;
             _verticalBias = verticalBias;
-            InitializeGradientTable(_seed);
-        }
-
-        public PerlinNoiseGenerator(IPerlinNoiseConfig config)
-        {
-            _scale = config.Scale;
-            _threshold = config.Threshold;
-            _octaves = config.Octaves;
-            _persistence = config.Persistence;
-            _lacunarity = config.Lacunarity;
-            _seed = config.Seed;
-            _verticalBias = config.VerticalBias;
             InitializeGradientTable(_seed);
         }
 

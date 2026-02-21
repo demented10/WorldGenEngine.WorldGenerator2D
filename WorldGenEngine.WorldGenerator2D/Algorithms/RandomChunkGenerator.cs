@@ -9,8 +9,6 @@ namespace WorldGenEngine.WorldGenerator2D.Algorithms
 {
     internal class RandomChunkGenerator : IChunkGenerationAlgo
     {
-
-
         public ChunkData GenerateChunk(ChunkPosition position, int seed = 0)
         {
             int chunkSeed = seed * 31 + position.ChunkXPos * 1323227 ^ position.ChunkYPos * 1365443;

@@ -1,12 +1,14 @@
+using raygui_cs;
 using Raylib_cs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using WorldGenEngine.WorldGenerator2D.Factories;
+using Raylib_ImGui;
 using WorldGenEngine.WorldGenerator2D.Models;
-using raygui_cs;
 using WorldGenEngine.WorldGenerator2D.Services.Statements;
+
+
 
 namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 {
@@ -27,7 +29,10 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 
         private WorldState _worldState;
 
-        public bool _needUpdate = true;
+        private string _loadChunkPosX;
+        private string _loadChunkPosY;
+
+        private int? _test = 1;
 
         public RaylibWorldStateVisualizer( WorldState worldState)
         {
@@ -37,8 +42,8 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 
         private void Init()
         {
-            Raylib_cs.Raylib.InitWindow(ScreenWidth, ScreenHeight, "Raylib Visualizer");
-            Raylib_cs.Raylib.SetTargetFPS(60);
+            Raylib.InitWindow(ScreenWidth, ScreenHeight, "Raylib Visualizer");
+            Raylib.SetTargetFPS(60);
 
 
             int[] codepoints = Enumerable.Range(32, 95).Concat(Enumerable.Range(0x0400, 256)).ToArray();
@@ -60,7 +65,8 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
         {
 
             if (!_isInitialized) Init();
-            
+
+            var renderer = new ImGuiRenderer();
 
 
             while (!Raylib.WindowShouldClose())
@@ -111,18 +117,30 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
                 Raylib.EndMode2D();
 
 
-                //if (Raygui.GuiButton(new Rectangle(ScreenWidth-200, ScreenHeight-60, 150, 30), "Regenerate Chunk") == 1)
-               // {
-                    //  _chunkData = _chunkGenerationServiceFactory.Create(GeneratorType.Random).GenerateChunkData(new ChunkPosition(0, 0));
+                
+                renderer.RenderImGui();
+                ImGuiRenderer.Begin("World params");
+
+                // Ввод текста (с автоматической обработкой всего)
+                ImGui.InputText("Координата X", ref _loadChunkPosX, 32);
+
+                if (ImGui.Button("Заспавнить чанк"))
+                {
+                    Console.WriteLine($"Спавним в: {_loadChunkPosX}");
+                }
+
+                renderer.
+
+                //if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 125, 150, 30), "Load Chunks") == 1)
+                //{
+                //    _loadedChunks = _worldState.GetChunksStates(new ChunkPosition(0, 0));
                 //}
-                if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 125, 150, 30), "Load Chunks") == 1)
-                {
-                    _loadedChunks = _worldState.GetChunksStates(new ChunkPosition(0, 0));
-                }
-                if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 155, 150, 30), "Save Chunks") == 1)
-                {
-                    _worldState.SaveChunks(_loadedChunks.ToArray());
-                }
+                //if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 155, 150, 30), "Save Chunks") == 1)
+                //{
+                //    _worldState.SaveChunks(_loadedChunks.ToArray());
+                //}
+
+
 
                 Raylib.EndDrawing();
             }
@@ -152,27 +170,47 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
             );
         }
 
-        public void VisualizeLoadedChunks(Camera2D camera)
+
+        private void VisualizeLoadedChunks(Camera2D camera)
         {
+
+            if (_loadedChunks == null || _loadedChunks.Count == 0)
+                return;
+
+            Rectangle viewRect = GetCameraViewRect(camera); // видимая область
 
             foreach (var chunkState in _loadedChunks)
             {
-                    
-                VisualizeChunk(chunkState.Data, chunkState.Position);
-
+                Rectangle chunkBounds = GetChunkBounds(chunkState.Position);
+                if (Raylib.CheckCollisionRecs(chunkBounds, viewRect))
+                {
+                    VisualizeChunk(chunkState.Data, chunkState.Position);
+                }
             }
         }
-
+        private Rectangle GetChunkBounds(ChunkPosition chunkPos)
+        {
+            float chunkWorldSize = ChunkData.ChunkSize * _tileSize;
+            float x = chunkPos.ChunkXPos * chunkWorldSize;
+            float y = chunkPos.ChunkYPos * chunkWorldSize;
+            return new Rectangle(x, y, chunkWorldSize, chunkWorldSize);
+        }
         public void VisualizeChunk(ChunkData chunkData, ChunkPosition chunkPosition)
         {
-            
+            float chunkWorldSize = ChunkData.ChunkSize * _tileSize;
+            float baseX = chunkPosition.ChunkXPos * chunkWorldSize;
+            float baseY = chunkPosition.ChunkYPos * chunkWorldSize;
+
             for (int y = 0; y < ChunkData.ChunkSize; y++)
             {
                 for (int x = 0; x < ChunkData.ChunkSize; x++)
                 {
                     TileData tile = chunkData.Tiles[y * ChunkData.ChunkSize + x];
                     Color tileColor = tile.IsSolid ? _solidTileColor : _emptyTileColor;
-                    Raylib.DrawRectangle((_tileSize*x) + (chunkPosition.ChunkXPos * ChunkData.ChunkSize), (_tileSize * y) + (chunkPosition.ChunkYPos * ChunkData.ChunkSize), _tileSize, _tileSize, tileColor);
+                    Raylib.DrawRectangle(
+                        (int)(baseX + x * _tileSize),
+                        (int)(baseY + y * _tileSize),
+                        _tileSize, _tileSize, tileColor);
                 }
             }
         }

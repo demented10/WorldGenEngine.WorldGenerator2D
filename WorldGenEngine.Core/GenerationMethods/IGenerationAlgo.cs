@@ -1,4 +1,4 @@
-﻿namespace WorldGenEngine.Core.GenerationMethods.Algorithms
+﻿namespace WorldGenEngine.Core.GenerationMethods
 {
     public interface IGenerationAlgo
     {

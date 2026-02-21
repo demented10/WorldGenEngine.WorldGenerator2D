@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using WorldGenEngine.Core.GenerationMethods.Algorithms;
 using WorldGenEngine.Core.MatrixAlgorithms.Algorithms;
 using WorldGenEngine.Core.MatrixGeneration.Generators;
 using WorldGenEngine.Core.MatrixGeneration.Models;

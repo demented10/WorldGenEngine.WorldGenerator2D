@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using WorldGenEngine.Core.GenerationMethods.Algorithms;
+using WorldGenEngine.Core.GenerationMethods;
 
 namespace WorldGenEngine.Core.MatrixGeneration.Generators
 {

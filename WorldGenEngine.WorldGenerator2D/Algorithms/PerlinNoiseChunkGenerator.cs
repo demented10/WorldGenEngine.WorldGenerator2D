@@ -1,7 +1,5 @@
-﻿using System;
+﻿
 using Microsoft.Extensions.Options;
-using WorldGenEngine.Core.GenerationMethods.Algorithms;
-using WorldGenEngine.Core.MatrixGeneration.Generators;
 using WorldGenEngine.Core.Noise;
 using WorldGenEngine.WorldGenerator2D.Models;
 using WorldGenEngine.WorldGenerator2D.Services.Generation;
@@ -12,9 +10,9 @@ namespace WorldGenEngine.WorldGenerator2D.Algorithms
     {
 
         private readonly FractalNoiseService _fractalNoiseService;
-        private readonly PerlinNoiseChunkGeneratorConfig _config;
+        private readonly NoiseChunkGeneratorConfig _config;
 
-        public PerlinNoiseChunkGenerator(FractalNoiseService fractalNoiseService, IOptions<PerlinNoiseChunkGeneratorConfig> config)
+        public PerlinNoiseChunkGenerator(FractalNoiseService fractalNoiseService, IOptions<NoiseChunkGeneratorConfig> config)
         {
             _fractalNoiseService = fractalNoiseService;
             _config = config.Value;
