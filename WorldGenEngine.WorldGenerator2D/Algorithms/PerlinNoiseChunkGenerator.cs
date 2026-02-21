@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using WorldGenEngine.Core.Noise;
 using WorldGenEngine.WorldGenerator2D.Models;
@@ -18,7 +19,7 @@ namespace WorldGenEngine.WorldGenerator2D.Algorithms
             _fractalNoiseService = fractalNoiseService;
             _config = config;
         }
-
+        [ActivatorUtilitiesConstructor]
         public PerlinNoiseChunkGenerator(FractalNoiseService fractalNoiseService, IOptions<NoiseChunkGeneratorConfig> config)
         {
             _fractalNoiseService = fractalNoiseService;

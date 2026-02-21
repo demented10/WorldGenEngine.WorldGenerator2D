@@ -1,0 +1,7 @@
+{
+  "name": "com.mormot.worldgen.core",
+  "version": "1.0.0",
+  "displayName": "WorldGenEngine Unity",
+  "description": "World Generation Engine for Unity",
+  "unity": "2021.3"
+}

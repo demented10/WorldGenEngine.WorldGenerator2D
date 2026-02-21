@@ -35,7 +35,12 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<IBinaryMatrixGenerator, RandomMatrixGenerator>();
         services.AddSingleton<IBinaryMatrixGenerator, PerlinNoiseMatrixGenerator>();
         services.AddSingleton<INoise, PerlinNoise>();
-        services.AddSingleton<FractalNoiseService>();
+        services.AddSingleton<FractalNoiseService>(sp =>
+        {
+            var noise = sp.GetRequiredService<INoise>();
+            var options = sp.GetRequiredService<FractalNoiseServiceConfig>();
+            return new FractalNoiseService(noise, options);
+        });
 
         return services;
     }

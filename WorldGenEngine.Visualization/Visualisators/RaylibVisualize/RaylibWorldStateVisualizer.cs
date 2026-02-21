@@ -66,7 +66,7 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
 
             if (!_isInitialized) Init();
 
-            var renderer = new ImGuiRenderer();
+
 
 
             while (!Raylib.WindowShouldClose())
@@ -117,28 +117,16 @@ namespace WorldGenEngine.Visualization.Visualisators.RaylibVisualize
                 Raylib.EndMode2D();
 
 
-                
-                renderer.RenderImGui();
-                ImGuiRenderer.Begin("World params");
 
-                // Ввод текста (с автоматической обработкой всего)
-                ImGui.InputText("Координата X", ref _loadChunkPosX, 32);
 
-                if (ImGui.Button("Заспавнить чанк"))
+                if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 125, 150, 30), "Load Chunks") == 1)
                 {
-                    Console.WriteLine($"Спавним в: {_loadChunkPosX}");
+                    _loadedChunks = _worldState.GetChunksStates(new ChunkPosition(0, 0));
                 }
-
-                renderer.
-
-                //if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 125, 150, 30), "Load Chunks") == 1)
-                //{
-                //    _loadedChunks = _worldState.GetChunksStates(new ChunkPosition(0, 0));
-                //}
-                //if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 155, 150, 30), "Save Chunks") == 1)
-                //{
-                //    _worldState.SaveChunks(_loadedChunks.ToArray());
-                //}
+                if (Raygui.GuiButton(new Rectangle(ScreenWidth - 200, ScreenHeight - 155, 150, 30), "Save Chunks") == 1)
+                {
+                    _worldState.SaveChunks(_loadedChunks.ToArray());
+                }
 
 
 

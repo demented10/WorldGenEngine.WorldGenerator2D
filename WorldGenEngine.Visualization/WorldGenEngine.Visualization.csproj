@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WorldGenEngine.Core\WorldGenEngine.Core.csproj" />
+    <ProjectReference Include="..\WorldGenEngine.Unity\WorldGenEngine.Unity.csproj" />
     <ProjectReference Include="..\WorldGenEngine.WorldGenerator2D\WorldGenEngine.WorldGenerator2D.csproj" />
   </ItemGroup>
 

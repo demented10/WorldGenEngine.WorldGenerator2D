@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
-using Microsoft.Extensions.Options;
 using WorldGenEngine.Core.Noise.Config;
 
 namespace WorldGenEngine.Core.Noise
@@ -17,6 +18,9 @@ namespace WorldGenEngine.Core.Noise
             _noise = noise;
             _config = config;
         }
+
+
+        [ActivatorUtilitiesConstructor]
         public FractalNoiseService(INoise noise, IOptions<FractalNoiseServiceConfig> config)
         {
             _noise = noise;

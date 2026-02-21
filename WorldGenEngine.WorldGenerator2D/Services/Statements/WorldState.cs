@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using System;
@@ -32,7 +33,7 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
             _options = options;
             _logger.LogInformation($"WorldState initialized with {_chunkStorageService.GetStoredChunkPositions()} existing chunks in storage.");
         }
-
+        [ActivatorUtilitiesConstructor]
         public WorldState(IChunkGenerationAlgo generationAlgo, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options, IOptions<WorldGenerationOptions> generationOptions, IChunkCachingService chunkCachingService, ILogger<WorldState> logger = null)
         {
             _chunkStorageService = chunkStorageService;
