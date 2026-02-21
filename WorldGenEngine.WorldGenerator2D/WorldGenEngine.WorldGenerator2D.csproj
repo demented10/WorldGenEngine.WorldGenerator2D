@@ -8,6 +8,38 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Algorithms.meta" />
+    <None Remove="Algorithms\NoiseChunkGeneratorConfig.cs.meta" />
+    <None Remove="Algorithms\PerlinNoiseChunkGenerator.cs.meta" />
+    <None Remove="Algorithms\RandomChunkGenerator.cs.meta" />
+    <None Remove="bin.meta" />
+    <None Remove="Factories.meta" />
+    <None Remove="Models.meta" />
+    <None Remove="obj.meta" />
+    <None Remove="package.json.meta" />
+    <None Remove="Properties.meta" />
+    <None Remove="Services.meta" />
+    <None Remove="Services\Caching.meta" />
+    <None Remove="Services\Caching\MemoryCachingService.cs.meta" />
+    <None Remove="Services\Generation.meta" />
+    <None Remove="Services\Generation\ChunkGenerationService.cs.meta" />
+    <None Remove="Services\Generation\IChunkGenerationAlgo.cs.meta" />
+    <None Remove="Services\Statements.meta" />
+    <None Remove="Services\Statements\ChunkState.cs.meta" />
+    <None Remove="Services\Statements\IChunkCachingService.cs.meta" />
+    <None Remove="Services\Statements\IChunkGenerationService.cs.meta" />
+    <None Remove="Services\Statements\IChunkStorageService.cs.meta" />
+    <None Remove="Services\Statements\WorldState.cs.meta" />
+    <None Remove="Services\Storage.meta" />
+    <None Remove="Services\Storage\InMemoryChunkStorage.cs.meta" />
+    <None Remove="WorldGenEngine.WorldGenerator2D.csproj.meta" />
+    <None Remove="WorldGenEngine.WorldGenerator2D.csproj.user.meta" />
+    <None Remove="WorldGenerationOptions.cs.meta" />
+    <None Remove="WorldGenerationServiceCollectionExtensions.cs.meta" />
+    <None Remove="WorldStateOptions.cs.meta" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3" />

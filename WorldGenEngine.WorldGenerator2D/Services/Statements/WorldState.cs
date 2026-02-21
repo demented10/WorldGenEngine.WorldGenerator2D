@@ -21,6 +21,18 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Statements
         private readonly WorldGenerationOptions _generationOptions;
         private readonly IChunkGenerationAlgo _generationAlgo;
 
+
+        public WorldState(IChunkGenerationAlgo generationAlgo, IChunkStorageService chunkStorageService, WorldStateOptions options, WorldGenerationOptions generationOptions, IChunkCachingService chunkCachingService, ILogger<WorldState> logger = null)
+        {
+            _chunkStorageService = chunkStorageService;
+            _chunkCachingService = chunkCachingService;
+            _generationOptions = generationOptions;
+            _generationAlgo = generationAlgo;
+            _logger = logger ?? NullLogger<WorldState>.Instance;
+            _options = options;
+            _logger.LogInformation($"WorldState initialized with {_chunkStorageService.GetStoredChunkPositions()} existing chunks in storage.");
+        }
+
         public WorldState(IChunkGenerationAlgo generationAlgo, IChunkStorageService chunkStorageService, IOptions<WorldStateOptions> options, IOptions<WorldGenerationOptions> generationOptions, IChunkCachingService chunkCachingService, ILogger<WorldState> logger = null)
         {
             _chunkStorageService = chunkStorageService;

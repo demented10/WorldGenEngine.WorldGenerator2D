@@ -12,6 +12,13 @@ namespace WorldGenEngine.WorldGenerator2D.Algorithms
         private readonly FractalNoiseService _fractalNoiseService;
         private readonly NoiseChunkGeneratorConfig _config;
 
+
+        public PerlinNoiseChunkGenerator(FractalNoiseService fractalNoiseService, NoiseChunkGeneratorConfig config)
+        {
+            _fractalNoiseService = fractalNoiseService;
+            _config = config;
+        }
+
         public PerlinNoiseChunkGenerator(FractalNoiseService fractalNoiseService, IOptions<NoiseChunkGeneratorConfig> config)
         {
             _fractalNoiseService = fractalNoiseService;

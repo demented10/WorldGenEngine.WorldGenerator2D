@@ -11,6 +11,12 @@ namespace WorldGenEngine.Core.Noise
     {
         private readonly INoise _noise;
         private readonly FractalNoiseServiceConfig _config;
+
+        public FractalNoiseService(INoise noise, FractalNoiseServiceConfig config)
+        {
+            _noise = noise;
+            _config = config;
+        }
         public FractalNoiseService(INoise noise, IOptions<FractalNoiseServiceConfig> config)
         {
             _noise = noise;

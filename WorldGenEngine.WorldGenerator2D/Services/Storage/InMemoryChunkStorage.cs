@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Microsoft.Extensions.Logging;
 using WorldGenEngine.WorldGenerator2D.Models;
 using WorldGenEngine.WorldGenerator2D.Services.Statements;
 
@@ -18,9 +19,10 @@ namespace WorldGenEngine.WorldGenerator2D.Services.Storage
 
         private Dictionary<ChunkPosition, long> _index;
 
-        public InMemoryChunkStorage(ILogger<InMemoryChunkStorage> logger)
+
+        public InMemoryChunkStorage(ILogger<InMemoryChunkStorage> logger = null)
         {
-            _logger = logger;
+            _logger = logger ?? NullLogger<InMemoryChunkStorage>.Instance;
             LoadIndex();
         }
         private void LoadIndex()

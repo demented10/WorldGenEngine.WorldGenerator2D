@@ -9,6 +9,7 @@
   <Project Path="WorldGenEngine.Tests/WorldGenEngine.Tests.csproj" Id="fba71ede-4d82-40c4-a0b9-550b70d9e71b">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
+  <Project Path="WorldGenEngine.Unity/WorldGenEngine.Unity.csproj" Id="7668146e-ffaa-4dce-b158-53547c8d4169" />
   <Project Path="WorldGenEngine.Visualization/WorldGenEngine.Visualization.csproj" Id="74be5849-3541-4f11-9ed5-72399ba3c9c3">
     <Platform Solution="*|x64" Project="x64" />
   </Project>
